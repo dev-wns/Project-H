@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 public class Network
 {
@@ -20,7 +21,7 @@ public class Network
 
         // 연결할 서버의 ip와 포트 설정
         IPEndPoint endPoint = new IPEndPoint( IPAddress.Parse( address ), port );
-        
+
         // 비동기 접속을 위한 event args
         // 비동기로 통신
         SocketAsyncEventArgs eventArguments = new SocketAsyncEventArgs();
@@ -79,5 +80,85 @@ public class Network
         }
 
 
+    }
+
+    SocketAsyncEventArgs receiveEventArgs;
+    MessageResolver msgResolver;
+    LinkedList<Packet> receivePacketList;
+    PacketHandler packetHandler;
+    byte[] receiveBuffer;
+    private Mutex mutexReceivePacketList;
+
+    void OnMessageComplected( Packet packet )
+    {
+        PushPacket( packet );
+    }
+
+    private void PushPacket( Packet packet )
+    {
+        lock ( mutexReceivePacketList )
+        {
+            receivePacketList.AddLast( packet );
+        }
+    }
+
+    public void Processpackets()
+    {
+        lock( mutexReceivePacketList )
+        {
+            // GamePacketHandler 객체에서 패킷처리 
+            foreach ( Packet packet in receivePacketList )
+                packetHandler.ParsePacket( packet );
+
+            receivePacketList.Clear();
+        }
+    }
+
+    public void Init()
+    {
+        // 받은 byte배열을 패킷으로 만들어 리스트에 넣고 gamePacketHandler에서 처리
+        receivePacketList = new LinkedList<Packet>();
+        receiveBuffer = new byte[Protocol.socketBufferSize];
+        msgResolver = new MessageResolver();
+
+        // 전송된 패킷을 처리
+        packetHandler = new PacketHandler();
+        packetHandler.Init( this );
+
+        // 메세지 받을 버퍼 설정 ( 4K )
+        // 만약 10K면 [ 4, 4, 2 ]로 3번에 나눠서 이벤트 발생
+        receiveEventArgs = new SocketAsyncEventArgs();
+        receiveEventArgs.Completed += OnReceiveComplected;
+        receiveEventArgs.UserToken = this;
+        receiveEventArgs.SetBuffer( receiveBuffer, 0, 1024 * 4 );
+    }
+
+    // 메세지 받기 시작
+    public void StartReceive()
+    {
+        // 서버가 연결된 상태에서 이 함수를 호출하여 메세지가 오기를 기다리자.
+        // 메세지가 오면 onReceiveComplected 콜백함수가 호출됨
+        if ( socket.ReceiveAsync( receiveEventArgs ) == false )
+            OnReceiveComplected( this, receiveEventArgs );
+    }
+
+    // 메세지가 왔을 때 동작하는 콜백함수
+    void OnReceiveComplected( object sender, SocketAsyncEventArgs socketEventArgs )
+    {
+        if ( socketEventArgs.BytesTransferred > 0 &&
+             socketEventArgs.SocketError == SocketError.Success )
+        {
+            // 전송 성공
+            // byte배열의 데이터를 다시 패킷으로 만들어준다.
+            msgResolver.OnReceive( socketEventArgs.Buffer, socketEventArgs.Offset, 
+                                   socketEventArgs.BytesTransferred, OnMessageComplected );
+
+            // 새로운 메세지를 받는다
+            StartReceive();
+        }
+        else
+        {
+            // 전송 실패, 서버가 닫혔거나 통신이 불가능 할 때
+        }
     }
 }
