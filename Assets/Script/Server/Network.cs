@@ -131,6 +131,8 @@ public class Network
         receiveEventArgs.Completed += OnReceiveComplected;
         receiveEventArgs.UserToken = this;
         receiveEventArgs.SetBuffer( receiveBuffer, 0, 1024 * 4 );
+
+        mutexReceivePacketList = new Mutex();
     }
 
     // 메세지 받기 시작
