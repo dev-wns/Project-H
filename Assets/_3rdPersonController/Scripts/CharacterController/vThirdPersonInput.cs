@@ -16,8 +16,10 @@ namespace Invector.vCharacterController
         [Header("Camera Input")]
         public string rotateCameraXInput = "Mouse X";
         public string rotateCameraYInput = "Mouse Y";
+        public string CameraDistanceInput = "CameraDistance";
+        public const float CameraDistanceChangeSpeed = 1;
 
-        [HideInInspector] public vThirdPersonController cc;
+        [HideInInspector] public vThirdPersonController controller;
         [HideInInspector] public vThirdPersonCamera tpCamera;
         [HideInInspector] public Camera cameraMain;
 
@@ -25,36 +27,38 @@ namespace Invector.vCharacterController
 
         protected virtual void Start()
         {
+            Cursor.lockState = CursorLockMode.Locked;
+
             InitilizeController();
             InitializeTpCamera();
         }
 
         protected virtual void FixedUpdate()
         {
-            cc.UpdateMotor();               // updates the ThirdPersonMotor methods
-            cc.ControlLocomotionType();     // handle the controller locomotion type and movespeed
-            cc.ControlRotationType();       // handle the controller rotation type
+            controller.UpdateMotor();               // updates the ThirdPersonMotor methods
+            controller.ControlLocomotionType();     // handle the controller locomotion type and movespeed
+            controller.ControlRotationType();       // handle the controller rotation type
         }
 
         protected virtual void Update()
         {
             InputHandle();                  // update the input methods
-            cc.UpdateAnimator();            // updates the Animator Parameters
+            controller.UpdateAnimator();            // updates the Animator Parameters
         }
 
         public virtual void OnAnimatorMove()
         {
-            cc.ControlAnimatorRootMotion(); // handle root motion animations 
+            controller.ControlAnimatorRootMotion(); // handle root motion animations 
         }
 
         #region Basic Locomotion Inputs
 
         protected virtual void InitilizeController()
         {
-            cc = GetComponent<vThirdPersonController>();
+            controller = GetComponent<vThirdPersonController>();
 
-            if (cc != null)
-                cc.Init();
+            if (controller != null)
+                controller.Init();
         }
 
         protected virtual void InitializeTpCamera()
@@ -83,8 +87,8 @@ namespace Invector.vCharacterController
 
         public virtual void MoveInput()
         {
-            cc.input.x = Input.GetAxis(horizontalInput);
-            cc.input.z = Input.GetAxis(verticallInput);
+            controller.input.x = Input.GetAxis(horizontalInput);
+            controller.input.z = Input.GetAxis(verticallInput);
         }
 
         protected virtual void CameraInput()
@@ -95,13 +99,13 @@ namespace Invector.vCharacterController
                 else
                 {
                     cameraMain = Camera.main;
-                    cc.rotateTarget = cameraMain.transform;
+                    controller.rotateTarget = cameraMain.transform;
                 }
             }
 
             if (cameraMain)
             {
-                cc.UpdateMoveDirection(cameraMain.transform);
+                controller.UpdateMoveDirection(cameraMain.transform);
             }
 
             if (tpCamera == null)
@@ -110,21 +114,22 @@ namespace Invector.vCharacterController
             var Y = Input.GetAxis(rotateCameraYInput);
             var X = Input.GetAxis(rotateCameraXInput);
 
+            tpCamera.defaultDistance -= Input.GetAxis( CameraDistanceInput ) * CameraDistanceChangeSpeed;
             tpCamera.RotateCamera(X, Y);
         }
 
         protected virtual void StrafeInput()
         {
             if (Input.GetKeyDown(strafeInput))
-                cc.Strafe();
+                controller.Strafe();
         }
 
         protected virtual void SprintInput()
         {
             if (Input.GetKeyDown(sprintInput))
-                cc.Sprint(true);
+                controller.Sprint(true);
             else if (Input.GetKeyUp(sprintInput))
-                cc.Sprint(false);
+                controller.Sprint(false);
         }
 
         /// <summary>
@@ -133,7 +138,7 @@ namespace Invector.vCharacterController
         /// <returns></returns>
         protected virtual bool JumpConditions()
         {
-            return cc.isGrounded && cc.GroundAngle() < cc.slopeLimit && !cc.isJumping && !cc.stopMove;
+            return controller.isGrounded && controller.GroundAngle() < controller.slopeLimit && !controller.isJumping && !controller.stopMove;
         }
 
         /// <summary>
@@ -142,7 +147,7 @@ namespace Invector.vCharacterController
         protected virtual void JumpInput()
         {
             if (Input.GetKeyDown(jumpInput) && JumpConditions())
-                cc.Jump();
+                controller.Jump();
         }
 
         #endregion       
