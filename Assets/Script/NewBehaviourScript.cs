@@ -14,6 +14,6 @@ public class NewBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        myTransform.Rotate( 0.0f, 400.0f * Time.deltaTime, 0.0f );
+        myTransform.Rotate( 0.0f, 300.0f * Time.deltaTime, 0.0f );
     }
 }

@@ -2319,6 +2319,7 @@ MonoBehaviour:
   rotateCameraXInput: Mouse X
   rotateCameraYInput: Mouse Y
   CameraDistanceInput: CameraDistance
+  CameraDistanceSpeed: 2
   controller: {fileID: 0}
   tpCamera: {fileID: 0}
   cameraMain: {fileID: 0}

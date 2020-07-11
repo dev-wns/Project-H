@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Invector.vCharacterController
 {
@@ -6,18 +7,18 @@ namespace Invector.vCharacterController
     {
         #region Variables       
 
-        [Header("Controller Input")]
+        [Header( "Controller Input" )]
         public string horizontalInput = "Horizontal";
         public string verticallInput = "Vertical";
         public KeyCode jumpInput = KeyCode.Space;
         public KeyCode strafeInput = KeyCode.Tab;
         public KeyCode sprintInput = KeyCode.LeftShift;
 
-        [Header("Camera Input")]
+        [Header( "Camera Input" )]
         public string rotateCameraXInput = "Mouse X";
         public string rotateCameraYInput = "Mouse Y";
         public string CameraDistanceInput = "CameraDistance";
-        public const float CameraDistanceChangeSpeed = 1;
+        public float CameraDistanceSpeed = 1;
 
         [HideInInspector] public vThirdPersonController controller;
         [HideInInspector] public vThirdPersonCamera tpCamera;
@@ -57,22 +58,29 @@ namespace Invector.vCharacterController
         {
             controller = GetComponent<vThirdPersonController>();
 
-            if (controller != null)
+            if ( controller != null )
+            {
                 controller.Init();
+            }
         }
 
         protected virtual void InitializeTpCamera()
         {
-            if (tpCamera == null)
+            if ( tpCamera != null )
             {
-                tpCamera = FindObjectOfType<vThirdPersonCamera>();
-                if (tpCamera == null)
-                    return;
-                if (tpCamera)
-                {
-                    tpCamera.SetMainTarget(this.transform);
-                    tpCamera.Init();
-                }
+                return;
+            }
+
+            tpCamera = FindObjectOfType<vThirdPersonCamera>();
+            if ( tpCamera == null )
+            {
+                return;
+            }
+
+            if ( tpCamera )
+            {
+                tpCamera.SetMainTarget( this.transform );
+                tpCamera.Init();
             }
         }
 
@@ -87,15 +95,18 @@ namespace Invector.vCharacterController
 
         public virtual void MoveInput()
         {
-            controller.input.x = Input.GetAxis(horizontalInput);
-            controller.input.z = Input.GetAxis(verticallInput);
+            controller.input.x = Input.GetAxis( horizontalInput );
+            controller.input.z = Input.GetAxis( verticallInput );
         }
 
         protected virtual void CameraInput()
         {
-            if (!cameraMain)
+            if ( cameraMain == null )
             {
-                if (!Camera.main) Debug.Log("Missing a Camera with the tag MainCamera, please add one.");
+                if ( Camera.main == null )
+                {
+                    Debug.Log( "[CameraInput] MainCamera not found." );
+                }
                 else
                 {
                     cameraMain = Camera.main;
@@ -103,33 +114,47 @@ namespace Invector.vCharacterController
                 }
             }
 
-            if (cameraMain)
+            if ( cameraMain != null )
             {
-                controller.UpdateMoveDirection(cameraMain.transform);
+                controller.UpdateMoveDirection( cameraMain.transform );
             }
 
-            if (tpCamera == null)
+            if ( tpCamera == null )
+            {
                 return;
+            }
 
-            var Y = Input.GetAxis(rotateCameraYInput);
-            var X = Input.GetAxis(rotateCameraXInput);
+            float Y = Input.GetAxis( rotateCameraYInput );
+            float X = Input.GetAxis( rotateCameraXInput );
+            tpCamera.RotateCamera( X, Y );
 
-            tpCamera.defaultDistance -= Input.GetAxis( CameraDistanceInput ) * CameraDistanceChangeSpeed;
-            tpCamera.RotateCamera(X, Y);
+            float distanceInput = Input.GetAxis( CameraDistanceInput );
+            if ( distanceInput != 0.0f )
+            {
+                const float minDistance = 1.0f;
+                const float maxDistance = 50.0f;
+                tpCamera.defaultDistance = Mathf.Clamp( tpCamera.defaultDistance - distanceInput * CameraDistanceSpeed, minDistance, maxDistance );
+            }
         }
 
         protected virtual void StrafeInput()
         {
-            if (Input.GetKeyDown(strafeInput))
+            if ( Input.GetKeyDown( strafeInput ) )
+            {
                 controller.Strafe();
+            }
         }
 
         protected virtual void SprintInput()
         {
-            if (Input.GetKeyDown(sprintInput))
-                controller.Sprint(true);
-            else if (Input.GetKeyUp(sprintInput))
-                controller.Sprint(false);
+            if ( Input.GetKeyDown( sprintInput ) )
+            {
+                controller.Sprint( true );
+            }
+            else if ( Input.GetKeyUp( sprintInput ) )
+            {
+                controller.Sprint( false );
+            }
         }
 
         /// <summary>
@@ -138,7 +163,7 @@ namespace Invector.vCharacterController
         /// <returns></returns>
         protected virtual bool JumpConditions()
         {
-            return controller.isGrounded && controller.GroundAngle() < controller.slopeLimit && !controller.isJumping && !controller.stopMove;
+            return controller.isGrounded == true && controller.isJumping == false && controller.stopMove == false && ( controller.GroundAngle() < controller.slopeLimit );
         }
 
         /// <summary>
@@ -146,8 +171,10 @@ namespace Invector.vCharacterController
         /// </summary>
         protected virtual void JumpInput()
         {
-            if (Input.GetKeyDown(jumpInput) && JumpConditions())
+            if ( Input.GetKeyDown( jumpInput ) == true && JumpConditions() == true )
+            {
                 controller.Jump();
+            }
         }
 
         #endregion       
