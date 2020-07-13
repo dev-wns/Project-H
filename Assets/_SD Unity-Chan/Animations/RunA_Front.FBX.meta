@@ -680,8 +680,8 @@ ModelImporter:
       name: RunA_front@loop
       takeName: Take 001
       internalID: 7400000
-      firstFrame: 16
-      lastFrame: 42
+      firstFrame: 29
+      lastFrame: 55
       wrapMode: 0
       orientationOffsetY: 0
       level: 0

@@ -20,6 +20,11 @@ namespace Invector.vCharacterController
         public string CameraDistanceInput = "CameraDistance";
         public float CameraDistanceSpeed = 1;
 
+        [Header( "Action Input" )]
+        public string basicAttackInput = "Attack";
+        public string dodgeInput = "Dodge";
+        public string targetingInput = "Targeting";
+
         [HideInInspector] public vThirdPersonController controller;
         [HideInInspector] public vThirdPersonCamera tpCamera;
         [HideInInspector] public Camera cameraMain;
@@ -32,13 +37,6 @@ namespace Invector.vCharacterController
 
             InitilizeController();
             InitializeTpCamera();
-        }
-
-        protected virtual void FixedUpdate()
-        {
-            controller.UpdateMotor();               // updates the ThirdPersonMotor methods
-            controller.ControlLocomotionType();     // handle the controller locomotion type and movespeed
-            controller.ControlRotationType();       // handle the controller rotation type
         }
 
         protected virtual void Update()
@@ -91,6 +89,7 @@ namespace Invector.vCharacterController
             SprintInput();
             StrafeInput();
             JumpInput();
+            ActionInput();
         }
 
         public virtual void MoveInput()
@@ -105,7 +104,7 @@ namespace Invector.vCharacterController
             {
                 if ( Camera.main == null )
                 {
-                    Debug.Log( "[CameraInput] MainCamera not found." );
+                    Debug.LogError( "[CameraInput] MainCamera not found." );
                 }
                 else
                 {
@@ -163,7 +162,10 @@ namespace Invector.vCharacterController
         /// <returns></returns>
         protected virtual bool JumpConditions()
         {
-            return controller.isGrounded == true && controller.isJumping == false && controller.stopMove == false && ( controller.GroundAngle() < controller.slopeLimit );
+            return controller.isGrounded == true
+                && controller.isJumping == false
+                && controller.stopMove == false
+                && controller.GroundAngle() < controller.slopeLimit;
         }
 
         /// <summary>
@@ -174,6 +176,36 @@ namespace Invector.vCharacterController
             if ( Input.GetKeyDown( jumpInput ) == true && JumpConditions() == true )
             {
                 controller.Jump();
+            }
+        }
+
+        float dodgeInputTime = 0.0f;
+        protected virtual void ActionInput()
+        {
+            if ( JumpConditions() == false )
+            {
+                return;
+            }
+
+            if ( Input.GetButtonDown( basicAttackInput ) == true )
+            {
+                controller.BasicAttack();
+            }
+
+            if ( Input.GetButtonUp( dodgeInput ) == true
+                && Time.time - dodgeInputTime < 0.2f )
+            {
+                controller.DodgeAction();
+            }
+
+            if ( Input.GetButtonDown( dodgeInput ) == true )
+            {
+                dodgeInputTime = Time.time;
+            }
+
+            if ( Input.GetButtonDown( targetingInput ) == true )
+            {
+                //controller.TargetingAction();
             }
         }
 

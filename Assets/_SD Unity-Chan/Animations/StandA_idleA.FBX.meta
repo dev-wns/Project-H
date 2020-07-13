@@ -842,7 +842,7 @@ ModelImporter:
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Eye_R
         weight: 1
-      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Face_BlendShapes
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Face
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_L_00
         weight: 1

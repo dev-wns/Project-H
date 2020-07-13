@@ -103,6 +103,21 @@ namespace Invector.vCharacterController
         internal Vector3 inputSmooth;                       // generate smooth input based on the inputSmooth value       
         internal Vector3 moveDirection;                     // used to know the direction you're moving 
 
+        internal bool isBlockedAction = false;
+
+        internal const int MaxComboCount = 3;
+        internal int currentComboCount = 0;
+
+        internal const float MaxComboDelay = 0.8f;
+        internal float remainComboDelay = 0.0f;
+
+        internal float moveSpeedRate = 1.0f;
+
+        internal const float DodgeDistance = 10.0f;
+        internal const float DodgeMoveTime = 1.0f;
+        public const float DodgeCooldown = 2.0f;
+        internal float remainDodgeCooldown = 0.0f;
+
         #endregion
 
         public void Init()
@@ -145,7 +160,13 @@ namespace Invector.vCharacterController
             isGrounded = true;
         }
 
-        public virtual void UpdateMotor()
+        private void Update()
+        {
+            remainComboDelay -= Time.deltaTime;
+            remainDodgeCooldown -= Time.deltaTime;
+        }
+
+        public virtual void FixedUpdate()
         {
             CheckGround();
             CheckSlopeLimit();
@@ -155,12 +176,20 @@ namespace Invector.vCharacterController
 
         #region Locomotion
 
-        public virtual void SetControllerMoveSpeed(vMovementSpeed speed)
+        public virtual void SetControllerMoveSpeed( vMovementSpeed speed )
         {
-            if (speed.walkByDefault)
-                moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.runningSpeed : speed.walkSpeed, speed.movementSmooth * Time.deltaTime);
+            // +코드정리
+            float targetMoveSpeed = 0.0f;
+            if ( speed.walkByDefault == true )
+            {
+                targetMoveSpeed = ( isSprinting == true ? speed.runningSpeed : speed.walkSpeed );
+            }
             else
-                moveSpeed = Mathf.Lerp(moveSpeed, isSprinting ? speed.sprintSpeed : speed.runningSpeed, speed.movementSmooth * Time.deltaTime);
+            {
+                targetMoveSpeed = ( isSprinting == true ? speed.sprintSpeed : speed.runningSpeed );
+            }
+
+            moveSpeed = Mathf.Lerp( moveSpeed, targetMoveSpeed * moveSpeedRate, speed.movementSmooth * Time.deltaTime );
         }
 
         public virtual void MoveCharacter(Vector3 _direction)
@@ -168,20 +197,28 @@ namespace Invector.vCharacterController
             // calculate input smooth
             inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
 
-            if (!isGrounded || isJumping) return;
+            if ( isGrounded == false || isJumping == true )
+            {
+                return;
+            }
 
             _direction.y = 0;
             _direction.x = Mathf.Clamp(_direction.x, -1f, 1f);
             _direction.z = Mathf.Clamp(_direction.z, -1f, 1f);
             // limit the input
             if (_direction.magnitude > 1f)
+            {
                 _direction.Normalize();
+            }
 
             Vector3 targetPosition = (useRootMotion ? animator.rootPosition : _rigidbody.position) + _direction * (stopMove ? 0 : moveSpeed) * Time.deltaTime;
-            Vector3 targetVelocity = (targetPosition - transform.position) / Time.deltaTime;
+            Vector3 targetVelocity = ( targetPosition - transform.position ) / Time.deltaTime;
 
-            bool useVerticalVelocity = true;
-            if (useVerticalVelocity) targetVelocity.y = _rigidbody.velocity.y;
+            //bool useVerticalVelocity = true;
+            //if ( useVerticalVelocity == true )
+            //{
+                //targetVelocity.y = _rigidbody.velocity.y;
+            //}
             _rigidbody.velocity = targetVelocity;
         }
 
@@ -224,7 +261,16 @@ namespace Invector.vCharacterController
 
         public virtual void RotateToDirection(Vector3 direction, float rotationSpeed)
         {
-            if (!jumpAndRotate && !isGrounded) return;
+            if ( isBlockedAction == true )
+            {
+                return;
+            }
+
+            if ( isGrounded == false && jumpAndRotate == false )
+            {
+                return;
+            }
+
             direction.y = 0f;
             Vector3 desiredForward = Vector3.RotateTowards(transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f);
             Quaternion _newRotation = Quaternion.LookRotation(desiredForward);
@@ -253,25 +299,33 @@ namespace Invector.vCharacterController
 
         public virtual void AirControl()
         {
-            if ((isGrounded && !isJumping)) return;
-            if (transform.position.y > heightReached) heightReached = transform.position.y;
+            if ( isGrounded == true && isJumping == false )
+            {
+                return;
+            }
+
+            if ( transform.position.y > heightReached )
+            {
+                heightReached = transform.position.y;
+            }
+
             inputSmooth = Vector3.Lerp(inputSmooth, input, airSmooth * Time.deltaTime);
 
-            if (jumpWithRigidbodyForce && !isGrounded)
+            if ( jumpWithRigidbodyForce == true&& isGrounded == false )
             {
                 _rigidbody.AddForce(moveDirection * airSpeed * Time.deltaTime, ForceMode.VelocityChange);
                 return;
             }
 
             moveDirection.y = 0;
-            moveDirection.x = Mathf.Clamp(moveDirection.x, -1f, 1f);
-            moveDirection.z = Mathf.Clamp(moveDirection.z, -1f, 1f);
+            moveDirection.x = Mathf.Clamp( moveDirection.x, -1f, 1f );
+            moveDirection.z = Mathf.Clamp( moveDirection.z, -1f, 1f );
 
-            Vector3 targetPosition = _rigidbody.position + (moveDirection * airSpeed) * Time.deltaTime;
-            Vector3 targetVelocity = (targetPosition - transform.position) / Time.deltaTime;
+            Vector3 targetPosition = _rigidbody.position + ( moveDirection * airSpeed ) * Time.deltaTime;
+            Vector3 targetVelocity = ( targetPosition - transform.position ) / Time.deltaTime;
 
             targetVelocity.y = _rigidbody.velocity.y;
-            _rigidbody.velocity = Vector3.Lerp(_rigidbody.velocity, targetVelocity, airSmooth * Time.deltaTime);
+            _rigidbody.velocity = Vector3.Lerp( _rigidbody.velocity, targetVelocity, airSmooth * Time.deltaTime );
         }
 
         protected virtual bool jumpFwdCondition

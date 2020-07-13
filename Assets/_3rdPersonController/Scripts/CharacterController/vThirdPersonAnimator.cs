@@ -43,13 +43,29 @@ namespace Invector.vCharacterController
             Vector3 relativeInput = transform.InverseTransformDirection( moveDirection );
 
             float additionalSpeed = ( isSprinting == true ? 0.5f : 0.0f );
-            verticalSpeed = relativeInput.z + additionalSpeed;
-            horizontalSpeed = relativeInput.x + additionalSpeed;
+            verticalSpeed = ( relativeInput.z + additionalSpeed ) * moveSpeedRate;
+            horizontalSpeed = ( relativeInput.x + additionalSpeed ) * moveSpeedRate;
 
             var newInput = new Vector2( verticalSpeed, horizontalSpeed );
 
             inputMagnitude = ( speed.walkByDefault == true ? walkSpeed : runningSpeed ) + additionalSpeed;
             inputMagnitude = Mathf.Clamp( newInput.magnitude, 0, inputMagnitude );
+        }
+
+        public virtual void EndAction()
+        {
+            animator.SetTrigger( vAnimatorParameters.EndAction );
+        }
+
+        public virtual void BasicAttack()
+        {
+            animator.SetInteger( vAnimatorParameters.ComboCount, currentComboCount );
+            animator.SetTrigger( vAnimatorParameters.Attack );
+        }
+
+        public virtual void DodgeAction()
+        {
+            animator.SetTrigger( vAnimatorParameters.DodgeAction );
         }
     }
 
@@ -62,5 +78,9 @@ namespace Invector.vCharacterController
         public static int IsStrafing = Animator.StringToHash( "IsStrafing" );
         public static int IsSprinting = Animator.StringToHash( "IsSprinting" );
         public static int GroundDistance = Animator.StringToHash( "GroundDistance" );
+        public static int Attack = Animator.StringToHash( "Attack" );
+        public static int ComboCount = Animator.StringToHash( "ComboCount" );
+        public static int EndAction = Animator.StringToHash( "EndAction" );
+        public static int DodgeAction = Animator.StringToHash( "DodgeAction" );
     }
 }

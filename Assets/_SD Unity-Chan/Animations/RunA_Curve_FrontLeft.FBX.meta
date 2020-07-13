@@ -41,8 +41,8 @@ ModelImporter:
       name: RunA_Curve_FrontLeft@loop
       takeName: Take 001
       internalID: 0
-      firstFrame: 77
-      lastFrame: 103
+      firstFrame: 29
+      lastFrame: 55
       wrapMode: 0
       orientationOffsetY: 0
       level: 0
@@ -67,20 +67,6 @@ ModelImporter:
         weight: 1
       - path: info
         weight: 0
-      - path: Mesh
-        weight: 0
-      - path: Mesh/Accessory_00
-        weight: 0
-      - path: Mesh/Costume_01
-        weight: 0
-      - path: Mesh/Costume_01_Skin
-        weight: 0
-      - path: Mesh/Eye_00
-        weight: 0
-      - path: Mesh/Hair_00
-        weight: 0
-      - path: Mesh/Manteau_00
-        weight: 0
       - path: Root
         weight: 1
       - path: Root/center
@@ -98,6 +84,8 @@ ModelImporter:
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Armor_Shoulder_L
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_L/Upper_Arm_L/Lower_Arm_L
         weight: 1
@@ -152,6 +140,8 @@ ModelImporter:
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Armor_Shoulder_R
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Clavicle_R/Upper_Arm_R/Lower_Arm_R
         weight: 1
@@ -219,7 +209,7 @@ ModelImporter:
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Eye_R
         weight: 1
-      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Face_BlendShapes
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Face
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_DownTwinTail_L_00
         weight: 1
@@ -236,6 +226,16 @@ ModelImporter:
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Front_00
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Front_00/Hair_Front_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02/Hair_Ponytail_03
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ponytail_00/Hair_Ponytail_01/Hair_Ponytail_02/Hair_Ponytail_03/Hair_Ponytail_04
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Ribbon_L_00
         weight: 1
@@ -257,15 +257,55 @@ ModelImporter:
         weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_Side_R_00/Hair_Side_R_01
         weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00/Hair_SideLong_L_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_L_00/Hair_SideLong_L_01/Hair_SideLong_L_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00/Hair_SideLong_R_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_SideLong_R_00/Hair_SideLong_R_01/Hair_SideLong_R_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00/Hair_UpTwintail_L_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_L_00/Hair_UpTwintail_L_01/Hair_UpTwintail_L_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00/Hair_UpTwintail_R_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Hair_UpTwintail_R_00/Hair_UpTwintail_R_01/Hair_UpTwintail_R_02
+        weight: 1
       - path: Root/center/Hips/Spine/Chest/Upper_Chest/Neck/Head/Jaw
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_L_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_L_00/Shawl_L_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_R_00
+        weight: 1
+      - path: Root/center/Hips/Spine/Chest/Upper_Chest/Shawl_R_00/Shawl_R_01
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Back_L_00
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01
         weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01/Skirt_Back_L_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Back_L_00/Skirt_Back_L_01/Skirt_Back_L_02/Skirt_Back_L_03
+        weight: 1
       - path: Root/center/Hips/Spine/Skirt_Back_R_00
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01/Skirt_Back_R_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Back_R_00/Skirt_Back_R_01/Skirt_Back_R_02/Skirt_Back_R_03
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Center_00
         weight: 1
@@ -275,17 +315,43 @@ ModelImporter:
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01
         weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01/Skirt_Front_L_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Front_L_00/Skirt_Front_L_01/Skirt_Front_L_02/Skirt_Front_L_03
+        weight: 1
       - path: Root/center/Hips/Spine/Skirt_Front_R_00
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01/Skirt_Front_R_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Front_R_00/Skirt_Front_R_01/Skirt_Front_R_02/Skirt_Front_R_03
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Side_L_00
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01
         weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01/Skirt_Side_L_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Side_L_00/Skirt_Side_L_01/Skirt_Side_L_02/Skirt_Side_L_03
+        weight: 1
       - path: Root/center/Hips/Spine/Skirt_Side_R_00
         weight: 1
       - path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01/Skirt_Side_R_02
+        weight: 1
+      - path: Root/center/Hips/Spine/Skirt_Side_R_00/Skirt_Side_R_01/Skirt_Side_R_02/Skirt_Side_R_03
+        weight: 1
+      - path: Root/center/Hips/Tail_00
+        weight: 1
+      - path: Root/center/Hips/Tail_00/Tail_01
+        weight: 1
+      - path: Root/center/Hips/Tail_00/Tail_01/Tail_02
+        weight: 1
+      - path: Root/center/Hips/Tail_00/Tail_01/Tail_02/Tail_03
+        weight: 1
+      - path: Root/center/Hips/Tail_00/Tail_01/Tail_02/Tail_03/Tail_04
         weight: 1
       - path: Root/center/Hips/Upper_Leg_L
         weight: 1
@@ -315,6 +381,20 @@ ModelImporter:
         weight: 1
       - path: Root/center/Hips/Upper_Leg_R/Upper_Leg_R_Twist_00
         weight: 1
+      - path: Root_Dummy_Meshs
+        weight: 0
+      - path: Root_Dummy_Meshs/Body_A
+        weight: 0
+      - path: Root_Dummy_Meshs/Body_B
+        weight: 0
+      - path: Root_Dummy_Meshs/Body_Eye
+        weight: 0
+      - path: Root_Dummy_Meshs/Body_FingerFootEnd
+        weight: 0
+      - path: Root_Dummy_Meshs/MsakGuide_HaonsSDKohaku-Chanz_add-bone_Allset
+        weight: 0
+      - path: Root_Dummy_Meshs/MsakGuide_HaonsSDKohaku-Chanz_add-bone_DefaultSet
+        weight: 0
       maskType: 1
       maskSource: {fileID: 101100000, guid: 457fa94621a1e6f469ad75beb836d5fd, type: 2}
       additiveReferencePoseFrame: 0
