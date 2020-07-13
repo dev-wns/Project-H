@@ -163,7 +163,7 @@ namespace Invector.vCharacterController
         public override void EndAction()
         {
             base.EndAction();
-            remainComboDelay = MaxComboDelay;
+            remainComboDelay = AllowComboDelay;
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
         }
@@ -187,17 +187,22 @@ namespace Invector.vCharacterController
                 }
             }
 
-            moveSpeedRate = 0.1f;
-            moveSpeed *= moveSpeedRate;
+            moveSpeed = moveSpeedRate = 0.0f;
             isBlockedAction = true;
             base.BasicAttack();
         }
 
         public override void DodgeAction()
         {
-            if ( isBlockedAction == true || remainDodgeCooldown > 0.0f )
+            if ( remainDodgeCooldown > 0.0f )
             {
                 return;
+            }
+
+            if ( isBlockedAction == true )
+            {
+                // 기존 액션 캔슬
+                EndAction();
             }
 
             moveSpeed = moveSpeedRate = 0.0f;
@@ -210,8 +215,9 @@ namespace Invector.vCharacterController
         // Called from AnimationClip
         protected IEnumerator DodgeMove()
         {
-            _rigidbody.transform.Rotate( _rigidbody.rotation * input.normalized );
-            Vector3 target = _rigidbody.position + _rigidbody.transform.forward * DodgeDistance;
+            moveDirection = _rigidbody.rotation * input.normalized;
+            _rigidbody.transform.LookAt( _rigidbody.position + moveDirection );
+            Vector3 targetPosition = _rigidbody.position + _rigidbody.transform.forward * DodgeDistance;
 
             WaitForFixedUpdate waitUpdate = new WaitForFixedUpdate();
             // 선후딜이 있어 Clip 길이와 정확히 일치하진 않음
@@ -221,11 +227,12 @@ namespace Invector.vCharacterController
             float actionSpeed = DodgeDistance / dodgeAnimationClip.length / DodgeDistance;
             while ( maxMoveTime > 0.0f )
             {
-                _rigidbody.MovePosition( Vector3.Lerp( _rigidbody.position, target, Time.fixedDeltaTime * actionSpeed ) );
+                _rigidbody.MovePosition( Vector3.Lerp( _rigidbody.position, targetPosition, Time.fixedDeltaTime * actionSpeed ) );
 
                 maxMoveTime -= Time.fixedDeltaTime;
                 yield return waitUpdate;
             }
+
             EndAction();
         }
 

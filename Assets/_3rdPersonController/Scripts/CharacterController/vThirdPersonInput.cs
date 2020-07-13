@@ -191,7 +191,7 @@ namespace Invector.vCharacterController
             {
                 controller.BasicAttack();
             }
-
+            
             if ( Input.GetButtonUp( dodgeInput ) == true
                 && Time.time - dodgeInputTime < 0.2f )
             {

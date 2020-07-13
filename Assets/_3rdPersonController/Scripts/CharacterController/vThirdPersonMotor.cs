@@ -4,6 +4,21 @@ namespace Invector.vCharacterController
 {
     public class vThirdPersonMotor : MonoBehaviour
     {
+        internal bool isBlockedAction = false;
+        internal float moveSpeedRate = 1.0f;
+
+        [Header( "- Action" )]
+
+        public int MaxComboCount = 3;
+        internal int currentComboCount = 0;
+
+        public float AllowComboDelay = 0.8f;
+        internal float remainComboDelay = 0.0f;
+
+        public float DodgeDistance = 10.0f;
+        public float DodgeCooldown = 2.0f;
+        internal float remainDodgeCooldown = 0.0f;
+
         #region Inspector Variables
 
         [Header("- Movement")]
@@ -102,21 +117,6 @@ namespace Invector.vCharacterController
         internal Vector3 colliderCenter;                    // storage the center of the capsule collider info                
         internal Vector3 inputSmooth;                       // generate smooth input based on the inputSmooth value       
         internal Vector3 moveDirection;                     // used to know the direction you're moving 
-
-        internal bool isBlockedAction = false;
-
-        internal const int MaxComboCount = 3;
-        internal int currentComboCount = 0;
-
-        internal const float MaxComboDelay = 0.8f;
-        internal float remainComboDelay = 0.0f;
-
-        internal float moveSpeedRate = 1.0f;
-
-        internal const float DodgeDistance = 10.0f;
-        internal const float DodgeMoveTime = 1.0f;
-        public const float DodgeCooldown = 2.0f;
-        internal float remainDodgeCooldown = 0.0f;
 
         #endregion
 
