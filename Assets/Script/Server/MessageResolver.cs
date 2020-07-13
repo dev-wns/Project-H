@@ -1,160 +1,146 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 
-public class MessageResolver : MonoBehaviour
+class Defines
 {
-    // 전체 데이터 전송이 완료 됐을 때 호출 할 콜백함수
-    public delegate void CompletedMessageCallback( Packet packet );
+    public static readonly short HEADERSIZE = 2;
+}
 
-    int msgSize;
-    byte[] msgBuffer    = new byte[1024 * 2000]; // 2000K
-    byte[] headerBuffer = new byte[4];           // 4Byte;
-    byte[] typeBuffer   = new byte[2];           // 2Byte;
+// [header][body] 구조를 갖는 데이터를 파싱하는 클래스
+// - header : 데이터 사이즈. Defines.HEADERSIZER에 정의된 타입만큼의 크기를 갖는다.
+//            2바이트일 경우 Int16, 4바이트일 경우 Int32로 처리하면 된다.
+//            본문의 크기가 Int16.Max값을 넘지 않는다면 2바이트로 처리하는 것이 좋을 것 같다.
+//
+// - body   : 메세지 본문
+public class MessageResolver
+{
+    public delegate void CompletedMessageACallback( Const<byte[]> buffer );
 
-    PacketType preType;
+    // 메세지 사이즈
+    int messageSize;
 
-    int headPosition;
-    int typePosition;
+    // 진행중인 버퍼
+    byte[] messageBuffer = new byte[1024];
+
+    // 현재 진행중인 버퍼의 인덱스를 가리키는 변수.
+    // 패킷 하나를 완성한 뒤에는 0으로 초기화 시켜줘야 한다.
     int currentPosition;
 
-    short msgType;
+    // 읽어와야 할 목표 위치
+    int positionToRead;
+
+    // 남은 사이즈
     int remainBytes;
 
-    bool isHeadCompleted;
-    bool isTypeCompleted;
-    bool isCompleted;
-
-    CompletedMessageCallback completeCallback;
-
-    public MessageResolver()
+    // 목표지점으로 설정된 위치까지의 바이트를 원본 버퍼로부터 복사한다.
+    // 데이터가 모자랄 경우 현재 남은 바이트 까지만 복사한다.
+    // <return> 다 읽었으면 ture, 데이터가 모자라서 못읽었으면 false를 리턴한다.
+    bool ReadUntil( byte[] buffer, ref int srcPosition, int offset, int transferred )
     {
-        ClearBuffer();
+        if ( this.currentPosition >= offset + transferred )
+        {
+            // 들어온 데이터 만큼 다 읽은 상태이므로 더이상 읽을 데이터가 없다.
+            return true;
+        }
+
+        // 읽어와야 할 바이트
+        // 데이터가 분리되어 올 경우 이전에 읽어놓은 값을 뺴줘서 부족한 만큼 읽어올 수 있도록 계산해 준다.
+        int copySize = this.positionToRead - this.currentPosition;
+
+        // 남은 데이터가 더 적다면 가능한 만큼만 복사한다.
+        if ( this.remainBytes < copySize )
+        {
+            copySize = this.remainBytes;
+        }
+
+        // 버퍼에 복사
+        Array.Copy( buffer, srcPosition, this.messageBuffer, this.currentPosition, copySize );
+
+        // 원본 버퍼 포지션 이동.
+        srcPosition += copySize;
+
+        // 타겟 버퍼 포지션 이동
+        this.currentPosition += copySize;
+
+        // 남은 바이트 수
+        this.remainBytes -= copySize;
+
+        // 목표지점에 도달 못했으면 false
+        if ( this.currentPosition < this.positionToRead )
+        {
+            return false;
+        }
+
+        return true;
     }
 
-    public void OnReceive( byte[] buffer, int offset, int transffered, CompletedMessageCallback callback )
+    // 소켓 버퍼로부터 데이터를 수신할 때마다 호출된다.
+    // 데이터가 남아 있을 때까지 계속 패킷을 만들어 callback함수를 호출한다.
+    // 하나의 패킷을 완성하지 못했다면 버퍼에 보관해 놓은 뒤 사음 수신을 기다린다.
+    public void OnReceive( byte[] buffer, int offset, int transferred, CompletedMessageACallback callback )
     {
-        // 현재 들어온 데이터의 위치 저장
+        // 이번 receive로 읽어오게 될 바이트 수
+        this.remainBytes = transferred;
+
+        // 원본 버퍼의 포지션값.
+        // 패킷이 여러개 뭉쳐 올 경우 원본 버퍼의 포지션은 계속 앞으로 가야하는데 그 처리를 위한 변수
         int srcPosition = offset;
 
-        // 메세지가 완성되면 콜백함수 호출
-        completeCallback = callback;
-
-        // 처리해야될 메세지 양 저장
-        remainBytes = transffered;
-
-        if ( isHeadCompleted == false )
+        // 남은 데이터가 있다면 계속 반복한다.
+        while ( this.remainBytes > 0 )
         {
-            // 패킷의 헤더 데이터가 완성되지 않았으면 읽어 온 데이터로 헤더를 완성
-            isHeadCompleted = ReadHead( buffer, ref srcPosition );
+            bool completed = false;
 
-            // 읽어온 데이터로도 헤더를 완성 못하면 다음 데이터 전송을 기다림
-            if ( isHeadCompleted == false ) return;
+            // 헤더만큼 못읽은 경우 헤더를 먼저 읽는다.
+            if ( this.currentPosition < Defines.HEADERSIZE )
+            {
+                // 목표지점 설정 ( 헤더 위치까지 도달하도록 설정 )
+                this.positionToRead = Defines.HEADERSIZE;
 
-            // 헤더를 완성했으면 헤더 정보에 있는 데이터의 전체 양을 확인
-            msgSize = GetBodySize();
+                completed = ReadUntil( buffer, ref srcPosition, offset, transferred );
+                if ( completed == false )
+                {
+                    // 아직 다 못읽었으므로 다음 receive를 기다린다.
+                    return;
+                }
 
-            // 잘못된 데이터인지 확인, 현재 20K 까지만 받을 수 있음
-            if ( msgSize < 0 || msgSize > Protocol.completeMessageSizeClient ) return;
+                // 헤더 하나를 온전히 읽어왔으므로 메세지 사이즈를 구한다.
+                this.messageSize = GetBodySize();
+
+                // 다음 목표 지점 ( 헤더 + 메세지 사이즈 )
+                this.positionToRead = this.messageSize + Defines.HEADERSIZE;
+            }
+
+            // 메세지를 읽는다.
+            completed = ReadUntil( buffer, ref srcPosition, offset, transferred );
+
+            if ( completed == true )
+            {
+                // 패킷 하나를 완성 했다.
+
+                callback( new Const<byte[]>( this.messageBuffer ) );
+
+                ClearBuffer();
+            }
         }
-
-        if ( isTypeCompleted == false )
-        {
-            // 남은 데이터가 있으면 타입 정보를 완성
-            isTypeCompleted = ReadType( buffer, ref srcPosition );
-
-            // 타입 정보를 완성하지 못했으면 다음 메세지 전송을 기다림
-            if ( isTypeCompleted == false ) return;
-
-            // 타입 정보를 완성했으면 패킷 타입을 정의
-            msgType = BitConverter.ToInt16( typeBuffer, 0 );
-
-            // 잘못된 데이터인지 확인
-            if ( msgType < 0 || msgType > ( int )PacketType.packetCount - 1 ) return;
-
-            // 데이터가 미완성일 경우, 다음에 전송되었을 때를 위해 저장
-            preType = ( PacketType )msgType;
-        }
-
-        if ( isCompleted == false )
-        {
-            // 남은 데이터가 있으면 데이터 완성과정을 진행
-            isCompleted = ReadBody( buffer, ref srcPosition );
-            if ( isCompleted == false ) return;
-        }
-
-        // 데이터가 완성 됬으면 패킷으로 만듬
-        Packet packet = new Packet();
-        packet.type = msgType;
-        packet.SetData( msgBuffer, msgSize );
-
-        // 패킷이 완성됬음을 알림
-        completeCallback( packet );
-
-        // 패킷을 만드는데 사용한 버퍼 초기화
-        ClearBuffer();
-    }
-
-    public void ClearBuffer()
-    {
-        Array.Clear( msgBuffer, 0, msgBuffer.Length );
-        Array.Clear( headerBuffer, 0, headerBuffer.Length );
-        Array.Clear( typeBuffer, 0, typeBuffer.Length );
-
-        msgSize = 0;
-        headPosition = 0;
-        typePosition = 0;
-        currentPosition = 0;
-        msgType = 0;
-        // remainBytes = 0;
-
-        isHeadCompleted = false;
-        isTypeCompleted = false;
-        isCompleted = false;
-    }
-
-    private bool ReadHead( byte[]buffer, ref int srcPosition )
-    {
-        return ReadUntil( buffer, ref srcPosition, headerBuffer, ref headPosition, 4 );
-    }
-
-    private bool ReadType( byte[] buffer, ref int srcPosition )
-    {
-        return ReadUntil( buffer, ref srcPosition, typeBuffer, ref typePosition, 4 );
-    }
-
-    private bool ReadBody( byte[] buffer, ref int srcPosition )
-    {
-        return ReadUntil( buffer, ref srcPosition, msgBuffer, ref currentPosition, msgSize );
-    }
-
-    bool ReadUntil( byte[] buffer, ref int srcPosition, byte[] destBuffer, ref int destPosition, int toSize )
-    {
-        // 남은 데이터가 없으면 리턴
-        if ( remainBytes < 0 ) return false;
-
-        int copySize = toSize - destPosition;
-        if ( remainBytes < copySize )
-            copySize = remainBytes;
-
-        Array.Copy( buffer, srcPosition, destBuffer, destPosition, copySize );
-
-        // 시작위치 이동
-        srcPosition += copySize;
-        destPosition += copySize;
-        remainBytes -= copySize;
-
-        return !( destPosition < toSize );
     }
 
     int GetBodySize()
     {
-        Type type = Protocol.headSize.GetType();
+        // 헤더 타입의 바이트만큼을 읽어와 메세지 사이즈를 리턴한다.
+        Type type = Defines.HEADERSIZE.GetType();
         if ( type.Equals( typeof( Int16 ) ) == true )
-            return BitConverter.ToInt16( headerBuffer, 0 );
+        {
+            return BitConverter.ToInt16( this.messageBuffer, 0 );
+        }
+        return BitConverter.ToInt32( this.messageBuffer, 0 );
+    }
 
-        return BitConverter.ToInt32( headerBuffer, 0 );
+    void ClearBuffer()
+    {
+        Array.Clear( this.messageBuffer, 0, this.messageBuffer.Length );
+
+        this.currentPosition = 0;
+        this.messageSize = 0;
     }
 }

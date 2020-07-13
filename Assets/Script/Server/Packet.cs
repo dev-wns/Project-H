@@ -1,76 +1,113 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
+// byte[] 버퍼를 참조로 보관하여 PopXXX메소드 호출 순서대로 데이터 변환을 수행한다.
 public class Packet
 {
-    public int type { get; set; }
-    public byte[] data { get; set; }
+    public IPeer owner { get; private set; }
+    public byte[] buffer { get; private set; }
+    public int position { get; private set; }
 
-    public Packet() {  }
+    Int16 Protocol_id;
 
-    public void SetData( byte[] _data, int _length )
+    public static Packet Create( Int16 protocol_id )
     {
-        data = new byte[_length];
-        // 복사할데이터, 복사받는데이터, 길이
-        Array.Copy( _data, data, _length );
+        Packet packet = PacketBufferManager.Pop();
+        packet.SetProtocol( protocol_id );
+        return packet;
     }
 
-    public byte[] GetSendBytes()
+    public static void Destroy( Packet packet )
     {
-        // BitConverter.GetBytes 지정된 값을 바이트 배열로 변환해줌
-        byte[] typeBytes = BitConverter.GetBytes( type );
-        int headerSize = ( int )( data.Length );
-        byte[] headerBytes = BitConverter.GetBytes( headerSize );
-        byte[] sendBytes = new byte[headerBytes.Length + typeBytes.Length + data.Length];
+        PacketBufferManager.Push( packet );
+    }
 
-        // 복사할 데이터, 시작인덱스, 받는데이터, 시작인덱스, 길이
-        Array.Copy( headerBytes, 0, sendBytes, 0, headerBytes.Length );
-        Array.Copy( typeBytes, 0, sendBytes, headerBytes.Length, typeBytes.Length );
-        Array.Copy( data, 0, sendBytes, headerBytes.Length + typeBytes.Length, data.Length );
+    public Packet( byte[] buffer, IPeer owner )
+    {
+        // 참조로만 보관하여 작업합니다.
+        // 복사가 필요하면 별도로 구현해야 합니다.
+        this.buffer = buffer;
 
-        return sendBytes;
+        // 헤더는 읽을 필요 없으니 그 이후부터 시작합니다.
+        this.position = Defines.HEADERSIZE;
+        this.owner = owner;
+    }
+    public Packet()
+    {
+        this.buffer = new byte[1024];
+    }
+
+    public Int16 PopProtocolID()
+    {
+        return PopInt16();
+    }
+
+    public Int16 PopInt16()
+    {
+        Int16 data = BitConverter.ToInt16( this.buffer, this.position );
+        this.position += sizeof( Int16 );
+        return data;
+    }
+
+    public Int32 PopInt32()
+    {
+        Int32 data = BitConverter.ToInt32( this.buffer, this.position );
+        this.position += sizeof( Int32 );
+        return data;
+    }
+
+    public string PopString()
+    {
+        // 문자열 길이는 최대 2바이트까지. 0 ~ 32767
+        Int16 len = BitConverter.ToInt16( this.buffer, this.position );
+        this.position += sizeof( Int16 );
+
+        // 인코딩은 UTF8로 통일 합니다.
+        string data = System.Text.Encoding.UTF8.GetString( this.buffer, this.position, len );
+        this.position += len;
+
+        return data;
+    }
+
+    public void SetProtocol( Int16 protocol_id )
+    {
+        this.Protocol_id = protocol_id;
+
+        // 헤더는 나중에 넣을 것 이므로 데이터부터 넣을 수 있도록 위치를 점프 시켜놓는다.
+        this.position = Defines.HEADERSIZE;
+        Push( protocol_id );
+    }
+
+    public void RecordSize()
+    {
+        Int16 BodySize = ( Int16 )( this.position - Defines.HEADERSIZE );
+        byte[] header = BitConverter.GetBytes( BodySize );
+        header.CopyTo( this.buffer, 0 );
+    }
+
+    public void Push( Int16 data )
+    {
+        byte[] tempBuffer = BitConverter.GetBytes( data );
+        tempBuffer.CopyTo( this.buffer, this.position );
+        this.position += tempBuffer.Length;
+    }
+    
+    public void Push( Int32 data )
+    {
+        byte[] tempBuffer = BitConverter.GetBytes( data );
+        tempBuffer.CopyTo( this.buffer, this.position );
+        this.position += tempBuffer.Length;
+    }
+
+    public void Push( string data )
+    {
+        byte[] tempBuffer = System.Text.Encoding.UTF8.GetBytes( data );
+        Int16 len = ( Int16 )tempBuffer.Length;
+        byte[] lenBuffer = BitConverter.GetBytes( len );
+        lenBuffer.CopyTo( this.buffer, this.position );
+        this.position += sizeof( Int16 );
+
+        tempBuffer.CopyTo( this.buffer, this.position );
+        this.position += tempBuffer.Length;
     }
 }
-
-// 객체를 저장하거나 메모리, 데이터베이스 같은 곳으로 전송할 때
-// 바이트 스트림으로 변환해주는 프로세스.
-// 필요할 때 다시 객체로 만들 수 있도록 상태를 저장.
-// 이 클래스 내부에는 직렬화 가능한 타입만 존재 해야함.
-// [Serializable]이 붙은 구조체나 원시타입( int, float ) 같은거.
-[Serializable] // 직렬화 가능한 구조체
-// Sequential 데이터를 내보낼 때 순차적으로 내보냄
-// Pack = 1 데이트 크기를 1Btyte로 맞춰줌 #pragma pack( push, 1)
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
-public class Data<Type> where Type : class  // where T : class ( Type에 클래스만 올수있음 )
-{
-    public Data() {  }
-
-    // 직렬화 ( 객체를 Byte배열로 )
-    public byte[] Serialize()
-    {
-        var size = Marshal.SizeOf( typeof( Type ) );
-        var array = new byte[size];
-        var ptr = Marshal.AllocHGlobal( size );
-        Marshal.StructureToPtr( this, ptr, true );
-        Marshal.Copy( ptr, array, 0, size );
-        Marshal.FreeHGlobal( ptr );
-        return array;
-    }
-
-    // 역 직렬화 ( Byte배열을 객체로 )
-    public static Type Deserialize( byte[] array )
-    {
-        int size = Marshal.SizeOf( typeof( Type ) );
-        // 지정된 바이트 사이즈만큼 관리되지않는 메모리영역에 할당
-        // 반환값은 새로 할당된 메모리에 대한 포인터
-        // GC한테 메모리에서 객체를 이동시키지 말라고 알려줌
-        IntPtr ptr = Marshal.AllocHGlobal( size );
-        Marshal.Copy( array, 0, ptr, size );
-        Type obj = ( Type )Marshal.PtrToStructure( ptr, typeof( Type ) );
-        Marshal.FreeHGlobal( ptr );
-        return obj;
-    }
-}
-
