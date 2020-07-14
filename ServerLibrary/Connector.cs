@@ -56,7 +56,7 @@ public class Connector
         else
         {
             // 연결 실패
-            Console.WriteLine( string.Format( "Failed to connect. {0}", e.SocketError ) );
+            Console.WriteLine( string.Format( "Failed to connect. {0}", args.SocketError ) );
         }
     }
 }
