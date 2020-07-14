@@ -280,7 +280,6 @@ GameObject:
   - component: {fileID: 534813038}
   - component: {fileID: 534813037}
   - component: {fileID: 534813036}
-  - component: {fileID: 534813040}
   m_Layer: 0
   m_Name: baka
   m_TagString: Untagged
@@ -365,18 +364,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &534813040
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 534813035}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4889d3b63064b2d4d8ea2d1363b97c9f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -5827,10 +5814,6 @@ PrefabInstance:
     - target: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
       propertyPath: m_Name
       value: Unity-chan GreatSword
-      objectReference: {fileID: 0}
-    - target: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
-      propertyPath: m_IsActive
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4956249427611764263, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
       propertyPath: m_LocalPosition.x

@@ -65,6 +65,7 @@ namespace Invector.vCharacterController
 
         public virtual void DodgeAction()
         {
+            animator.SetFloat( vAnimatorParameters.DodgeActionSpeed, DodgeActionSpeed );
             animator.SetTrigger( vAnimatorParameters.DodgeAction );
         }
     }
@@ -82,5 +83,6 @@ namespace Invector.vCharacterController
         public static int ComboCount = Animator.StringToHash( "ComboCount" );
         public static int EndAction = Animator.StringToHash( "EndAction" );
         public static int DodgeAction = Animator.StringToHash( "DodgeAction" );
+        public static int DodgeActionSpeed = Animator.StringToHash( "DodgeActionSpeed" );
     }
 }

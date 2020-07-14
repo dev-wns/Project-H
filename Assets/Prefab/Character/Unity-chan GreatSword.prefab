@@ -3131,6 +3131,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73fbf3aa05f6be24780438449f505aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxComboCount: 3
+  AllowComboDelay: 0.8
+  DodgeDistance: 10
+  DodgeActionSpeed: 1.3
+  DodgeCooldown: 1
   useRootMotion: 0
   rotateByWorld: 0
   useContinuousSprint: 1

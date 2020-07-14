@@ -160,6 +160,7 @@ namespace Invector.vCharacterController
             }
         }
 
+        // Called from AnimationClip
         public override void EndAction()
         {
             base.EndAction();
@@ -167,6 +168,7 @@ namespace Invector.vCharacterController
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
         }
+
         public override void BasicAttack()
         {
             if ( isBlockedAction == true )
@@ -215,19 +217,27 @@ namespace Invector.vCharacterController
         // Called from AnimationClip
         protected IEnumerator DodgeMove()
         {
-            moveDirection = _rigidbody.rotation * input.normalized;
-            _rigidbody.transform.LookAt( _rigidbody.position + moveDirection );
+            if ( input.sqrMagnitude <= 0.001 )
+            {
+                moveDirection = _rigidbody.transform.forward;
+            }
+            else
+            {
+                UpdateMoveDirection( Camera.main.transform );
+            }
+            _rigidbody.transform.rotation = Quaternion.LookRotation( moveDirection );
             Vector3 targetPosition = _rigidbody.position + _rigidbody.transform.forward * DodgeDistance;
-
+            
             WaitForFixedUpdate waitUpdate = new WaitForFixedUpdate();
             // 선후딜이 있어 Clip 길이와 정확히 일치하진 않음
-            // TODO: 재생속도에 따른 정확한 길이 구하도록
-            float maxMoveTime = dodgeAnimationClip.length;
+            // Clip에서 EndAction() 호출하고 있어서 적당히 해도 될듯
+            float maxMoveTime = dodgeAnimationClip.length / DodgeActionSpeed;
+            
             // ex) 0.5초안에 10m을 가야한다면, actionSpeed == 10.0 / 0.5 / 10.0 == 2.0
-            float actionSpeed = DodgeDistance / dodgeAnimationClip.length / DodgeDistance;
+            float dodgeSpeedRate = DodgeDistance / dodgeAnimationClip.length / DodgeDistance;
             while ( maxMoveTime > 0.0f )
             {
-                _rigidbody.MovePosition( Vector3.Lerp( _rigidbody.position, targetPosition, Time.fixedDeltaTime * actionSpeed ) );
+                _rigidbody.MovePosition( Vector3.Lerp( _rigidbody.position, targetPosition, Time.fixedDeltaTime * dodgeSpeedRate ) );
 
                 maxMoveTime -= Time.fixedDeltaTime;
                 yield return waitUpdate;
@@ -236,6 +246,7 @@ namespace Invector.vCharacterController
             EndAction();
         }
 
+        // Called from AnimationClip
         protected void DodgeStop()
         {
             StopCoroutine( "DodgeMove" );

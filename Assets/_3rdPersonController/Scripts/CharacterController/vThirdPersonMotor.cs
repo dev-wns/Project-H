@@ -16,6 +16,7 @@ namespace Invector.vCharacterController
         internal float remainComboDelay = 0.0f;
 
         public float DodgeDistance = 10.0f;
+        public float DodgeActionSpeed = 1.0f;
         public float DodgeCooldown = 2.0f;
         internal float remainDodgeCooldown = 0.0f;
 
