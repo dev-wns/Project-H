@@ -2,9 +2,12 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Net;
+using UnityEngine.UI;
 
 public class ClientSample : MonoBehaviour
 {
+    public InputField input;
+
     static List<IPeer> servers = new List<IPeer>();
     NetworkService service;
     Connector connector;
@@ -21,11 +24,12 @@ public class ClientSample : MonoBehaviour
         connector.Connect( endPoint );
     }
 
-    public void ChatEnter( string text )
+    public void ChatEnter()
     {
         Packet msg = Packet.Create( ( short )PROTOCOL.CHAT_MSG_REQ );
-        msg.Push( text );
+        msg.Push( input.text );
         servers[0].Send( msg );
+        input.text = "";
     }
 
     public static void OnConnectedServer( UserToken token )
