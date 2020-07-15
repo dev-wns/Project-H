@@ -4,13 +4,18 @@ using UnityEngine;
 using System.Net;
 using UnityEngine.UI;
 
-public class ClientSample : MonoBehaviour
+public class Server : MonoBehaviour
 {
-    public InputField input;
+    private static List<IPeer> servers = new List<IPeer>();
+    private NetworkService service;
+    private Connector connector;
 
-    static List<IPeer> servers = new List<IPeer>();
-    NetworkService service;
-    Connector connector;
+    public static IPeer GetServer()
+    {
+        if ( servers.Count == 0 ) return null;
+
+        return servers[0];
+    }
 
     private void Awake()
     {
@@ -22,16 +27,8 @@ public class ClientSample : MonoBehaviour
         connector.callbackConnected += OnConnectedServer;
         IPEndPoint endPoint = new IPEndPoint( IPAddress.Parse( "127.0.0.1" ), 7979 );
         connector.Connect( endPoint );
-    }
-
-    public void ChatEnter()
-    {
-        Packet msg = Packet.Create( ( short )PROTOCOL.CHAT_MSG_REQ );
-        msg.Push( input.text );
-        servers[0].Send( msg );
-        input.text = "";
-    }
-
+    }   
+    
     public static void OnConnectedServer( UserToken token )
     {
         lock( servers )

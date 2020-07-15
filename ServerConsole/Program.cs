@@ -9,7 +9,7 @@ class Program
 
     static void Main( string[] args )
     {
-        PacketBufferManager.Initialize( 2000 );     
+        PacketBufferManager.Initialize( 2000 );
         userList = new List<User>();
 
         NetworkService service = new NetworkService();

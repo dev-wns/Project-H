@@ -133,6 +133,8 @@ public class NetworkService
             userToken = receiveArgs.UserToken as UserToken;
             this.callbackSessionCreated( userToken );
         }
+
+        BeginReceive( clientSocket, receiveArgs, sendArgs );
     }
 
     private void BeginReceive( Socket socket, SocketAsyncEventArgs receiveArgs, SocketAsyncEventArgs sendArgs )

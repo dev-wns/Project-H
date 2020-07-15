@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class RemoteServerPeer : IPeer
 {
@@ -21,7 +20,8 @@ public class RemoteServerPeer : IPeer
             case PROTOCOL.CHAT_MSG_ACK:
                 {
                     string text = msg.PopString();
-                    Console.WriteLine( string.Format( "text {0}", text ) );
+                    ChatManager.AddPacket( text );
+                    // Console.WriteLine( string.Format( "text {0}", text ) );
                 } break;
             default: break;
         }
