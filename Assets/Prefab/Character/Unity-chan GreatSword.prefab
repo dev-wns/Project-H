@@ -3131,6 +3131,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73fbf3aa05f6be24780438449f505aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  TargetingRange: 15
+  currentTarget: {fileID: 0}
   MaxComboCount: 3
   AllowComboDelay: 0.8
   DodgeDistance: 10
@@ -3153,12 +3155,12 @@ MonoBehaviour:
   strafeSpeed:
     movementSmooth: 6
     animationSmooth: 0.2
-    rotationSpeed: 16
+    rotationSpeed: 10
     walkByDefault: 0
     rotateWithCamera: 0
     walkSpeed: 2.5
-    runningSpeed: 5
-    sprintSpeed: 9
+    runningSpeed: 4
+    sprintSpeed: 8
   jumpWithRigidbodyForce: 0
   jumpAndRotate: 1
   jumpTimer: 0.3

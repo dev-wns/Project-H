@@ -1,4 +1,5 @@
 ﻿using Invector;
+using Invector.vCharacterController;
 using UnityEngine;
 
 public class vThirdPersonCamera : MonoBehaviour
@@ -10,7 +11,7 @@ public class vThirdPersonCamera : MonoBehaviour
     public float smoothCameraRotation = 12f;
     [Tooltip("What layer will be culled")]
     public LayerMask cullingLayer = 1 << 0;
-    [Tooltip("Debug purposes, lock the camera behind the character for better align the states")]
+    [Tooltip( "Debug purposes, lock the camera behind the character for better align the states" )]
     public bool lockCamera;
 
     public float rightOffset = 0f;
@@ -132,7 +133,7 @@ public class vThirdPersonCamera : MonoBehaviour
 
         movementSpeed.x = x;
         movementSpeed.y = -y;
-        if (!lockCamera)
+        if ( lockCamera == false )
         {
             mouseY = vExtensions.ClampAngle(mouseY, yMinLimit, yMaxLimit);
             mouseX = vExtensions.ClampAngle(mouseX, xMinLimit, xMaxLimit);
@@ -199,8 +200,19 @@ public class vThirdPersonCamera : MonoBehaviour
         lookPoint += (targetLookAt.right * Vector3.Dot(camDir * (distance), targetLookAt.right));
         targetLookAt.position = current_cPos;
 
-        Quaternion newRot = Quaternion.Euler(mouseY, mouseX, 0);
-        targetLookAt.rotation = Quaternion.Slerp(targetLookAt.rotation, newRot, smoothCameraRotation * Time.deltaTime);
+        Quaternion newRotation;
+        Character myCharacter = currentTarget.gameObject.GetComponent<Character>();
+        if ( myCharacter?.IsTargeting() == true )
+        {
+            Vector3 direction = myCharacter.currentTarget.transform.position - transform.position;
+            newRotation = Quaternion.LookRotation( direction.normalized );
+        }
+        else
+        {
+            newRotation = Quaternion.Euler( mouseY, mouseX, 0 );
+        }
+        targetLookAt.rotation = Quaternion.Slerp( targetLookAt.rotation, newRotation, smoothCameraRotation * Time.deltaTime );
+
         transform.position = current_cPos + (camDir * (distance));
         var rotation = Quaternion.LookRotation((lookPoint) - transform.position);
 

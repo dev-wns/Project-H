@@ -2,9 +2,10 @@
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonMotor : MonoBehaviour
+    public class vThirdPersonMotor : Character
     {
         internal bool isBlockedAction = false;
+        internal bool isCancelableAction = false;
         internal float moveSpeedRate = 1.0f;
 
         [Header( "- Action" )]
@@ -429,6 +430,11 @@ namespace Invector.vCharacterController
             var dir = isStrafing && input.magnitude > 0 ? (transform.right * input.x + transform.forward * input.z).normalized : transform.forward;
             var movementAngle = Vector3.Angle(dir, groundHit.normal) - 90;
             return movementAngle;
+        }
+
+        public override bool IsTargeting()
+        {
+            return base.IsTargeting() == true && _isStrafing == true;
         }
 
         #endregion

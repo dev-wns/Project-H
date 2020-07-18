@@ -34,6 +34,23 @@ namespace Invector.vCharacterController
             base.FixedUpdate();
             ControlLocomotionType();
             ControlRotationType();
+
+            if ( IsTargeting() == true )
+            {
+                if ( isBlockedAction == false && isSprinting == false )
+                {
+                    Vector3 direction = ( currentTarget.transform.position - _rigidbody.transform.position );
+                    direction.y = 0.0f;
+                    Quaternion target = Quaternion.LookRotation( direction.normalized );
+                    _rigidbody.transform.rotation = Quaternion.Slerp( _rigidbody.transform.rotation, target, Time.fixedDeltaTime * strafeSpeed.rotationSpeed );
+                }
+
+                if ( Vector3.Distance( _rigidbody.transform.position, currentTarget.transform.position ) > TargetingRange )
+                {
+                    currentTarget = null;
+                    Strafe( false );
+                }
+            }
         }
 
         public virtual void ControlLocomotionType()
@@ -106,8 +123,8 @@ namespace Invector.vCharacterController
 
         public virtual void Sprint( bool value )
         {
-            bool sprintConditions = ( input.sqrMagnitude > 0.1f && isGrounded == true );
-            sprintConditions = sprintConditions == true && ( isStrafing == true && strafeSpeed.walkByDefault == false && ( horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f ) ) == false;
+            bool sprintConditions = ( input.sqrMagnitude > 0.1f && isGrounded == true ) && strafeSpeed.walkByDefault == false;
+            //sprintConditions = sprintConditions == true && ( isStrafing == true && strafeSpeed.walkByDefault == false && ( horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f ) ) == false;
 
             if ( value == true && sprintConditions == true )
             {
@@ -133,9 +150,9 @@ namespace Invector.vCharacterController
             }
         }
 
-        public virtual void Strafe()
+        public virtual void Strafe( bool isEnable )
         {
-            isStrafing = !isStrafing;
+            isStrafing = isEnable;
         }
 
         public virtual void Jump()
@@ -160,6 +177,41 @@ namespace Invector.vCharacterController
             }
         }
 
+        public virtual void Targeting()
+        {
+            Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
+
+            Debug.DrawRay( ray.origin, TargetingRange * ray.direction, Color.blue, 3.0f );
+
+            RaycastHit rayHit;
+            if ( Physics.Raycast( ray, out rayHit, TargetingRange ) == true )
+            {
+                currentTarget = rayHit.collider.GetComponent<Actor>();
+                if ( currentTarget != null )
+                {
+                    Debug.Log( "Target : " + currentTarget );
+                    Strafe( true );
+                    return;
+                }
+            }
+
+            currentTarget = null;
+            Strafe( false );
+        }
+
+        #region Actions
+
+        public virtual void SetActionCancelable()
+        {
+            isCancelableAction = true;
+        }
+
+        public virtual void StartAction()
+        {
+            moveSpeed = moveSpeedRate = 0.0f;
+            isBlockedAction = true;
+        }
+
         // Called from AnimationClip
         public override void EndAction()
         {
@@ -167,13 +219,26 @@ namespace Invector.vCharacterController
             remainComboDelay = AllowComboDelay;
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
+            isCancelableAction = false;
+        }
+
+        public override void CancelAction()
+        {
+            base.CancelAction();
+            moveSpeedRate = 1.0f;
+            isBlockedAction = false;
+            isCancelableAction = false;
         }
 
         public override void BasicAttack()
         {
             if ( isBlockedAction == true )
             {
-                return;
+                if ( isCancelableAction == false )
+                {
+                    return;
+                }
+                CancelAction();
             }
 
             if ( remainComboDelay <= 0.0f )
@@ -189,8 +254,7 @@ namespace Invector.vCharacterController
                 }
             }
 
-            moveSpeed = moveSpeedRate = 0.0f;
-            isBlockedAction = true;
+            StartAction();
             base.BasicAttack();
         }
 
@@ -203,13 +267,10 @@ namespace Invector.vCharacterController
 
             if ( isBlockedAction == true )
             {
-                // 기존 액션 캔슬
-                EndAction();
+                CancelAction();
             }
 
-            moveSpeed = moveSpeedRate = 0.0f;
-            isBlockedAction = true;
-
+            StartAction();
             base.DodgeAction();
             remainDodgeCooldown = DodgeCooldown;
         }
@@ -251,5 +312,7 @@ namespace Invector.vCharacterController
         {
             StopCoroutine( "DodgeMove" );
         }
+
+        #endregion
     }
 }

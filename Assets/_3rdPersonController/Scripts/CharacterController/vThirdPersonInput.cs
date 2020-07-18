@@ -140,7 +140,7 @@ namespace Invector.vCharacterController
         {
             if ( Input.GetKeyDown( strafeInput ) )
             {
-                controller.Strafe();
+                controller.Strafe( !controller._isStrafing );
             }
         }
 
@@ -205,7 +205,7 @@ namespace Invector.vCharacterController
 
             if ( Input.GetButtonDown( targetingInput ) == true )
             {
-                //controller.TargetingAction();
+                controller.Targeting();
             }
         }
 
