@@ -10,16 +10,12 @@ namespace Invector.vCharacterController
 
         [Header( "- Action" )]
 
-        public int MaxComboCount = 3;
-        internal int currentComboCount = 0;
-
-        public float AllowComboDelay = 0.8f;
-        internal float remainComboDelay = 0.0f;
+        public StatusInt comboCount;
+        public StatusFloat comboDelay;
 
         public float DodgeDistance = 10.0f;
         public float DodgeActionSpeed = 1.0f;
-        public float DodgeCooldown = 2.0f;
-        internal float remainDodgeCooldown = 0.0f;
+        public StatusFloat dodgeCooldown;
 
         #region Inspector Variables
 
@@ -122,6 +118,32 @@ namespace Invector.vCharacterController
 
         #endregion
 
+        #region UnityEvent
+
+        protected override void Awake()
+        {
+            base.Awake();
+            comboCount.Reset();
+            comboDelay.Reset();
+            dodgeCooldown.Reset();
+        }
+
+        protected virtual void Update()
+        {
+            comboDelay.current -= Time.deltaTime;
+            dodgeCooldown.current -= Time.deltaTime;
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            CheckGround();
+            CheckSlopeLimit();
+            ControlJumpBehaviour();
+            AirControl();
+        }
+
+        #endregion
+
         public void Init()
         {
             animator = GetComponent<Animator>();
@@ -160,20 +182,6 @@ namespace Invector.vCharacterController
             colliderHeight = GetComponent<CapsuleCollider>().height;
 
             isGrounded = true;
-        }
-
-        private void Update()
-        {
-            remainComboDelay -= Time.deltaTime;
-            remainDodgeCooldown -= Time.deltaTime;
-        }
-
-        public virtual void FixedUpdate()
-        {
-            CheckGround();
-            CheckSlopeLimit();
-            ControlJumpBehaviour();
-            AirControl();
         }
 
         #region Locomotion

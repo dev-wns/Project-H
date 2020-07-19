@@ -353,12 +353,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73fbf3aa05f6be24780438449f505aa3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  HP:
+    max: 100
+    current: 0
+  AttackPower:
+    max: 1
+    current: 0
+  TargetingRange: 50
   currentTarget: {fileID: 0}
-  MaxComboCount: 3
-  AllowComboDelay: 0.8
+  comboCount:
+    max: 3
+    current: 0
+  comboDelay:
+    max: 0.8
+    current: 0
   DodgeDistance: 10
   DodgeActionSpeed: 1.3
-  DodgeCooldown: 1
+  dodgeCooldown:
+    max: 1.4
+    current: 0
   useRootMotion: 0
   rotateByWorld: 0
   useContinuousSprint: 1

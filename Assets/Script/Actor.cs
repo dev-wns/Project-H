@@ -1,26 +1,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using UnityEngine;
 
 public class Actor : MonoBehaviour
 {
     [Header( "- Actor" )]
 
-    public float maxHP;
-    public float MaxHP
-    {
-        get { return maxHP; }
-        set { maxHP = value; }
-    }
-    protected float currentHP;
-    public float HP
-    {
-        get { return currentHP; }
-        set { currentHP = Mathf.Clamp( value, 0, MaxHP ); }
-    }
-
-    public float AttackPower { get; set; }
+    public StatusFloat HP;
+    public StatusFloat AttackPower;
 
     public enum ETeamType
     {
@@ -28,8 +17,120 @@ public class Actor : MonoBehaviour
     }
     public ETeamType TeamType { get; set; }
 
-    private void OnTriggerEnter( Collider other )
+    #region UnityEvent
+
+    protected virtual void Awake()
+    {
+        HP.Reset();
+        AttackPower.Reset();
+    }
+
+    protected void OnTriggerEnter( Collider other )
     {
 
+    }
+
+    #endregion
+}
+
+[Serializable]
+public struct StatusFloat
+{
+    public float max;
+    public float Max
+    {
+        get { return max; }
+        set
+        {
+            if ( max == value )
+            {
+                return;
+            }
+
+            float old = max;
+            max = value;
+            current = Math.Min( current, max );
+
+            OnChangeMax?.Invoke( old, max );
+        }
+    }
+    public delegate void DelChangeMax( float oldValue, float newValue );
+    public event DelChangeMax OnChangeMax;
+
+    [HideInInspector]
+    public float current;
+    public float Current
+    {
+        get { return current; }
+        set
+        {
+            if ( current == value )
+            {
+                return;
+            }
+
+            float old = current;
+            current = Mathf.Clamp( value, 0, Max );
+
+            OnChangeCurrent?.Invoke( old, current );
+        }
+    }
+    public delegate void DelChangeCurrent( float oldValue, float newValue );
+    public event DelChangeCurrent OnChangeCurrent;
+
+    public void Reset()
+    {
+        current = max;
+    }
+}
+
+[Serializable]
+public struct StatusInt
+{
+    public int max;
+    public int Max
+    {
+        get { return max; }
+        set
+        {
+            if ( max == value )
+            {
+                return;
+            }
+
+            int old = max;
+            max = value;
+            current = Math.Min( current, max );
+
+            OnChangeMax?.Invoke( old, max );
+        }
+    }
+    public delegate void DelChangeMax( int oldValue, int newValue );
+    public event DelChangeMax OnChangeMax;
+
+    [HideInInspector]
+    public int current;
+    public int Current
+    {
+        get { return current; }
+        set
+        {
+            if ( current == value )
+            {
+                return;
+            }
+
+            int old = current;
+            current = Mathf.Clamp( value, 0, Max );
+
+            OnChangeCurrent?.Invoke( old, current );
+        }
+    }
+    public delegate void DelChangeCurrent( int oldValue, int newValue );
+    public event DelChangeCurrent OnChangeCurrent;
+
+    public void Reset()
+    {
+        current = max;
     }
 }

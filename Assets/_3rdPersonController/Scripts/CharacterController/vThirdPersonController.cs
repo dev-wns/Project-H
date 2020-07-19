@@ -29,7 +29,7 @@ namespace Invector.vCharacterController
             }
         }
 
-        public override void FixedUpdate()
+        protected override void FixedUpdate()
         {
             base.FixedUpdate();
             ControlLocomotionType();
@@ -216,7 +216,7 @@ namespace Invector.vCharacterController
         public override void EndAction()
         {
             base.EndAction();
-            remainComboDelay = AllowComboDelay;
+            comboDelay.Reset();
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
@@ -241,16 +241,16 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            if ( remainComboDelay <= 0.0f )
+            if ( comboDelay.Current <= 0.0f )
             {
-                currentComboCount = 0;
+                comboCount.Current = 0;
             }
             else
             {
-                ++currentComboCount;
-                if ( currentComboCount > MaxComboCount )
+                ++comboCount.Current;
+                if ( comboCount.Current > comboCount.Max )
                 {
-                    currentComboCount = 0;
+                    comboCount.Current = 0;
                 }
             }
 
@@ -260,7 +260,7 @@ namespace Invector.vCharacterController
 
         public override void DodgeAction()
         {
-            if ( remainDodgeCooldown > 0.0f )
+            if ( dodgeCooldown.Current > 0.0f )
             {
                 return;
             }
@@ -272,7 +272,7 @@ namespace Invector.vCharacterController
 
             StartAction();
             base.DodgeAction();
-            remainDodgeCooldown = DodgeCooldown;
+            dodgeCooldown.Reset();
         }
 
         // Called from AnimationClip

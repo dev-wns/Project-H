@@ -64,7 +64,7 @@ namespace Invector.vCharacterController
 
         public virtual void BasicAttack()
         {
-            animator.SetInteger( vAnimatorParameters.ComboCount, currentComboCount );
+            animator.SetInteger( vAnimatorParameters.ComboCount, comboCount.Current );
             animator.SetTrigger( vAnimatorParameters.Attack );
         }
 
