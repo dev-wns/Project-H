@@ -276,7 +276,7 @@ namespace Invector.vCharacterController
             direction.y = 0f;
             Vector3 desiredForward = Vector3.RotateTowards(transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f);
             Quaternion _newRotation = Quaternion.LookRotation(desiredForward);
-            transform.rotation = _newRotation;
+            _rigidbody.MoveRotation( _newRotation );
         }
 
         #endregion

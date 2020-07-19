@@ -1,28 +1,32 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Actor : MonoBehaviour
 {
-    float HP
+    [Header( "- Actor" )]
+
+    public float maxHP;
+    public float MaxHP
     {
-        get;
-        set;
+        get { return maxHP; }
+        set { maxHP = value; }
     }
-    float AttackPower
+    protected float currentHP;
+    public float HP
     {
-        get;
-        set;
+        get { return currentHP; }
+        set { currentHP = Mathf.Clamp( value, 0, MaxHP ); }
     }
-    enum TeamType
+
+    public float AttackPower { get; set; }
+
+    public enum ETeamType
     {
         RED, BLUE, GREEN
     }
-    TeamType Team
-    {
-        get;
-        set;
-    }
+    public ETeamType TeamType { get; set; }
 
     private void OnTriggerEnter( Collider other )
     {

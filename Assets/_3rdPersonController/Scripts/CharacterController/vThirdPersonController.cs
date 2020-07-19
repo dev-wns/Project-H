@@ -19,8 +19,8 @@ namespace Invector.vCharacterController
 
             if ( inputSmooth == Vector3.zero )
             {
-                transform.position = animator.rootPosition;
-                transform.rotation = animator.rootRotation;
+                _rigidbody.position = animator.rootPosition;
+                _rigidbody.rotation = animator.rootRotation;
             }
 
             if ( useRootMotion == true )
@@ -39,13 +39,13 @@ namespace Invector.vCharacterController
             {
                 if ( isBlockedAction == false && isSprinting == false )
                 {
-                    Vector3 direction = ( currentTarget.transform.position - _rigidbody.transform.position );
+                    Vector3 direction = ( currentTarget.transform.position - _rigidbody.position );
                     direction.y = 0.0f;
                     Quaternion target = Quaternion.LookRotation( direction.normalized );
-                    _rigidbody.transform.rotation = Quaternion.Slerp( _rigidbody.transform.rotation, target, Time.fixedDeltaTime * strafeSpeed.rotationSpeed );
+                    _rigidbody.MoveRotation( Quaternion.Slerp( _rigidbody.rotation, target, Time.fixedDeltaTime * strafeSpeed.rotationSpeed ) );
                 }
 
-                if ( Vector3.Distance( _rigidbody.transform.position, currentTarget.transform.position ) > TargetingRange )
+                if ( Vector3.Distance( _rigidbody.position, currentTarget.transform.position ) > TargetingRange )
                 {
                     currentTarget = null;
                     Strafe( false );
@@ -280,14 +280,14 @@ namespace Invector.vCharacterController
         {
             if ( input.sqrMagnitude <= 0.001 )
             {
-                moveDirection = _rigidbody.transform.forward;
+                moveDirection = transform.forward;
             }
             else
             {
                 UpdateMoveDirection( Camera.main.transform );
             }
-            _rigidbody.transform.rotation = Quaternion.LookRotation( moveDirection );
-            Vector3 targetPosition = _rigidbody.position + _rigidbody.transform.forward * DodgeDistance;
+            transform.rotation = Quaternion.LookRotation( moveDirection );
+            Vector3 targetPosition = _rigidbody.position + transform.forward * DodgeDistance;
             
             WaitForFixedUpdate waitUpdate = new WaitForFixedUpdate();
             // 선후딜이 있어 Clip 길이와 정확히 일치하진 않음
