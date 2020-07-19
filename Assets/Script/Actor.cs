@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 public class Actor : MonoBehaviour
 {
@@ -11,11 +12,7 @@ public class Actor : MonoBehaviour
     public StatusFloat HP;
     public StatusFloat AttackPower;
 
-    public enum ETeamType
-    {
-        RED, BLUE, GREEN
-    }
-    public ETeamType TeamType { get; set; }
+    public ETeamType TeamType;
 
     #region UnityEvent
 
@@ -31,6 +28,11 @@ public class Actor : MonoBehaviour
     }
 
     #endregion
+}
+
+public enum ETeamType
+{
+    RED, BLUE, GREEN
 }
 
 [Serializable]
@@ -82,6 +84,11 @@ public struct StatusFloat
     {
         current = max;
     }
+
+    public void SetZero()
+    {
+        current = 0.0f;
+    }
 }
 
 [Serializable]
@@ -132,5 +139,10 @@ public struct StatusInt
     public void Reset()
     {
         current = max;
+    }
+
+    public void SetZero()
+    {
+        current = 0;
     }
 }

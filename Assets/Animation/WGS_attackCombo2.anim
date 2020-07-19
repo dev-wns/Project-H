@@ -125927,6 +125927,13 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
+  - time: 0.3
+    functionName: SpawnProjectile
+    data: 
+    objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
   - time: 0.6666667
     functionName: EndAction
     data: 

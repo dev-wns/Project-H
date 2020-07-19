@@ -52,6 +52,8 @@ namespace Invector.vCharacterController
             inputMagnitude = Mathf.Clamp( newInput.magnitude, 0, inputMagnitude );
         }
 
+        #region Action
+
         public virtual void EndAction()
         {
             animator.SetTrigger( vAnimatorParameters.EndAction );
@@ -73,6 +75,8 @@ namespace Invector.vCharacterController
             animator.SetFloat( vAnimatorParameters.DodgeActionSpeed, DodgeActionSpeed );
             animator.SetTrigger( vAnimatorParameters.DodgeAction );
         }
+
+        #endregion
     }
 
     public static partial class vAnimatorParameters

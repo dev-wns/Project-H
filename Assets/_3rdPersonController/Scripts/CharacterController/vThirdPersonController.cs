@@ -10,23 +10,13 @@ namespace Invector.vCharacterController
     {
         public AnimationClip dodgeAnimationClip;
 
-        public virtual void ControlAnimatorRootMotion()
+        public GameObject projectile;
+
+        #region UnityEvent
+
+        protected override void Awake()
         {
-            if ( this.enabled == false )
-            {
-                return;
-            }
-
-            if ( inputSmooth == Vector3.zero )
-            {
-                _rigidbody.position = animator.rootPosition;
-                _rigidbody.rotation = animator.rootRotation;
-            }
-
-            if ( useRootMotion == true )
-            {
-                MoveCharacter( moveDirection );
-            }
+            base.Awake();
         }
 
         protected override void FixedUpdate()
@@ -50,6 +40,29 @@ namespace Invector.vCharacterController
                     currentTarget = null;
                     Strafe( false );
                 }
+            }
+        }
+
+        #endregion
+
+        #region Control
+
+        public virtual void ControlAnimatorRootMotion()
+        {
+            if ( this.enabled == false )
+            {
+                return;
+            }
+
+            if ( inputSmooth == Vector3.zero )
+            {
+                _rigidbody.position = animator.rootPosition;
+                _rigidbody.rotation = animator.rootRotation;
+            }
+
+            if ( useRootMotion == true )
+            {
+                MoveCharacter( moveDirection );
             }
         }
 
@@ -199,7 +212,9 @@ namespace Invector.vCharacterController
             Strafe( false );
         }
 
-        #region Actions
+        #endregion
+
+        #region Action
 
         public virtual void SetActionCancelable()
         {
@@ -247,7 +262,7 @@ namespace Invector.vCharacterController
             }
             else
             {
-                ++comboCount.Current;
+                //++comboCount.Current;
                 if ( comboCount.Current > comboCount.Max )
                 {
                     comboCount.Current = 0;
@@ -288,12 +303,12 @@ namespace Invector.vCharacterController
             }
             transform.rotation = Quaternion.LookRotation( moveDirection );
             Vector3 targetPosition = _rigidbody.position + transform.forward * DodgeDistance;
-            
+
             WaitForFixedUpdate waitUpdate = new WaitForFixedUpdate();
             // 선후딜이 있어 Clip 길이와 정확히 일치하진 않음
             // Clip에서 EndAction() 호출하고 있어서 적당히 해도 될듯
             float maxMoveTime = dodgeAnimationClip.length / DodgeActionSpeed;
-            
+
             // ex) 0.5초안에 10m을 가야한다면, actionSpeed == 10.0 / 0.5 / 10.0 == 2.0
             float dodgeSpeedRate = DodgeDistance / dodgeAnimationClip.length / DodgeDistance;
             while ( maxMoveTime > 0.0f )
@@ -314,5 +329,11 @@ namespace Invector.vCharacterController
         }
 
         #endregion
+
+        public virtual void SpawnProjectile()
+        {
+            GameObject newObject =  Instantiate<GameObject>( projectile, transform.position + transform.forward * 0.5f + Vector3.up * 0.5f, transform.rotation );
+            newObject.GetComponent<Projectile>().parent = this;
+        }
     }
 }

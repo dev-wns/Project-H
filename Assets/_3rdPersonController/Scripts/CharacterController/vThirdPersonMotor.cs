@@ -123,9 +123,9 @@ namespace Invector.vCharacterController
         protected override void Awake()
         {
             base.Awake();
-            comboCount.Reset();
-            comboDelay.Reset();
-            dodgeCooldown.Reset();
+            comboCount.SetZero();
+            comboDelay.SetZero();
+            dodgeCooldown.SetZero();
         }
 
         protected virtual void Update()
