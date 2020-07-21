@@ -22,6 +22,12 @@ public class Packet
         PacketBufferManager.Push( packet );
     }
 
+    public Packet( byte[] buffer )
+    {
+        this.buffer = buffer;
+        this.position = Defines.HEADERSIZE;
+    }
+
     public Packet( byte[] buffer, IPeer owner )
     {
         // 참조로만 보관하여 작업합니다.
@@ -32,6 +38,7 @@ public class Packet
         this.position = Defines.HEADERSIZE;
         this.owner = owner;
     }
+
     public Packet()
     {
         this.buffer = new byte[1024];
