@@ -43,8 +43,8 @@ namespace Invector.vCharacterController
             Vector3 relativeInput = transform.InverseTransformDirection( moveDirection );
 
             float additionalSpeed = ( isSprinting == true ? 0.5f : 0.0f );
-            verticalSpeed = ( relativeInput.z + additionalSpeed ) * moveSpeedRate;
-            horizontalSpeed = ( relativeInput.x + additionalSpeed ) * moveSpeedRate;
+            verticalSpeed = relativeInput.z + additionalSpeed;
+            horizontalSpeed = relativeInput.x + additionalSpeed;
 
             var newInput = new Vector2( verticalSpeed, horizontalSpeed );
 
@@ -52,14 +52,21 @@ namespace Invector.vCharacterController
             inputMagnitude = Mathf.Clamp( newInput.magnitude, 0, inputMagnitude );
         }
 
+        #region Action
+
         public virtual void EndAction()
         {
             animator.SetTrigger( vAnimatorParameters.EndAction );
         }
 
+        public virtual void CancelAction()
+        {
+            //animator.SetTrigger( vAnimatorParameters.CancelAction );
+        }
+
         public virtual void BasicAttack()
         {
-            animator.SetInteger( vAnimatorParameters.ComboCount, currentComboCount );
+            animator.SetInteger( vAnimatorParameters.ComboCount, comboCount.Current );
             animator.SetTrigger( vAnimatorParameters.Attack );
         }
 
@@ -68,6 +75,8 @@ namespace Invector.vCharacterController
             animator.SetFloat( vAnimatorParameters.DodgeActionSpeed, DodgeActionSpeed );
             animator.SetTrigger( vAnimatorParameters.DodgeAction );
         }
+
+        #endregion
     }
 
     public static partial class vAnimatorParameters
@@ -82,6 +91,7 @@ namespace Invector.vCharacterController
         public static int Attack = Animator.StringToHash( "Attack" );
         public static int ComboCount = Animator.StringToHash( "ComboCount" );
         public static int EndAction = Animator.StringToHash( "EndAction" );
+        public static int CancelAction = Animator.StringToHash( "CancelAction" );
         public static int DodgeAction = Animator.StringToHash( "DodgeAction" );
         public static int DodgeActionSpeed = Animator.StringToHash( "DodgeActionSpeed" );
     }

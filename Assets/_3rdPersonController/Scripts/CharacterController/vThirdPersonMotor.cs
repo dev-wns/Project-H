@@ -2,23 +2,20 @@
 
 namespace Invector.vCharacterController
 {
-    public class vThirdPersonMotor : MonoBehaviour
+    public class vThirdPersonMotor : Character
     {
         internal bool isBlockedAction = false;
+        internal bool isCancelableAction = false;
         internal float moveSpeedRate = 1.0f;
 
         [Header( "- Action" )]
 
-        public int MaxComboCount = 3;
-        internal int currentComboCount = 0;
-
-        public float AllowComboDelay = 0.8f;
-        internal float remainComboDelay = 0.0f;
+        public StatusInt comboCount;
+        public StatusFloat comboDelay;
 
         public float DodgeDistance = 10.0f;
         public float DodgeActionSpeed = 1.0f;
-        public float DodgeCooldown = 2.0f;
-        internal float remainDodgeCooldown = 0.0f;
+        public StatusFloat dodgeCooldown;
 
         #region Inspector Variables
 
@@ -121,6 +118,32 @@ namespace Invector.vCharacterController
 
         #endregion
 
+        #region UnityEvent
+
+        protected override void Awake()
+        {
+            base.Awake();
+            comboCount.SetZero();
+            comboDelay.SetZero();
+            dodgeCooldown.SetZero();
+        }
+
+        protected virtual void Update()
+        {
+            comboDelay.current -= Time.deltaTime;
+            dodgeCooldown.current -= Time.deltaTime;
+        }
+
+        protected virtual void FixedUpdate()
+        {
+            CheckGround();
+            CheckSlopeLimit();
+            ControlJumpBehaviour();
+            AirControl();
+        }
+
+        #endregion
+
         public void Init()
         {
             animator = GetComponent<Animator>();
@@ -159,20 +182,6 @@ namespace Invector.vCharacterController
             colliderHeight = GetComponent<CapsuleCollider>().height;
 
             isGrounded = true;
-        }
-
-        private void Update()
-        {
-            remainComboDelay -= Time.deltaTime;
-            remainDodgeCooldown -= Time.deltaTime;
-        }
-
-        public virtual void FixedUpdate()
-        {
-            CheckGround();
-            CheckSlopeLimit();
-            ControlJumpBehaviour();
-            AirControl();
         }
 
         #region Locomotion
@@ -275,7 +284,7 @@ namespace Invector.vCharacterController
             direction.y = 0f;
             Vector3 desiredForward = Vector3.RotateTowards(transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f);
             Quaternion _newRotation = Quaternion.LookRotation(desiredForward);
-            transform.rotation = _newRotation;
+            _rigidbody.MoveRotation( _newRotation );
         }
 
         #endregion
@@ -429,6 +438,11 @@ namespace Invector.vCharacterController
             var dir = isStrafing && input.magnitude > 0 ? (transform.right * input.x + transform.forward * input.z).normalized : transform.forward;
             var movementAngle = Vector3.Angle(dir, groundHit.normal) - 90;
             return movementAngle;
+        }
+
+        public override bool IsTargeting()
+        {
+            return base.IsTargeting() == true && _isStrafing == true;
         }
 
         #endregion

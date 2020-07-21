@@ -10,6 +10,43 @@ namespace Invector.vCharacterController
     {
         public AnimationClip dodgeAnimationClip;
 
+        public GameObject projectile;
+
+        #region UnityEvent
+
+        protected override void Awake()
+        {
+            base.Awake();
+        }
+
+        protected override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            ControlLocomotionType();
+            ControlRotationType();
+
+            if ( IsTargeting() == true )
+            {
+                if ( isBlockedAction == false && isSprinting == false )
+                {
+                    Vector3 direction = ( currentTarget.transform.position - _rigidbody.position );
+                    direction.y = 0.0f;
+                    Quaternion target = Quaternion.LookRotation( direction.normalized );
+                    _rigidbody.MoveRotation( Quaternion.Slerp( _rigidbody.rotation, target, Time.fixedDeltaTime * strafeSpeed.rotationSpeed ) );
+                }
+
+                if ( Vector3.Distance( _rigidbody.position, currentTarget.transform.position ) > TargetingRange )
+                {
+                    currentTarget = null;
+                    Strafe( false );
+                }
+            }
+        }
+
+        #endregion
+
+        #region Control
+
         public virtual void ControlAnimatorRootMotion()
         {
             if ( this.enabled == false )
@@ -19,21 +56,14 @@ namespace Invector.vCharacterController
 
             if ( inputSmooth == Vector3.zero )
             {
-                transform.position = animator.rootPosition;
-                transform.rotation = animator.rootRotation;
+                _rigidbody.position = animator.rootPosition;
+                _rigidbody.rotation = animator.rootRotation;
             }
 
             if ( useRootMotion == true )
             {
                 MoveCharacter( moveDirection );
             }
-        }
-
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            ControlLocomotionType();
-            ControlRotationType();
         }
 
         public virtual void ControlLocomotionType()
@@ -106,8 +136,8 @@ namespace Invector.vCharacterController
 
         public virtual void Sprint( bool value )
         {
-            bool sprintConditions = ( input.sqrMagnitude > 0.1f && isGrounded == true );
-            sprintConditions = sprintConditions == true && ( isStrafing == true && strafeSpeed.walkByDefault == false && ( horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f ) ) == false;
+            bool sprintConditions = ( input.sqrMagnitude > 0.1f && isGrounded == true ) && strafeSpeed.walkByDefault == false;
+            //sprintConditions = sprintConditions == true && ( isStrafing == true && strafeSpeed.walkByDefault == false && ( horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f ) ) == false;
 
             if ( value == true && sprintConditions == true )
             {
@@ -133,9 +163,9 @@ namespace Invector.vCharacterController
             }
         }
 
-        public virtual void Strafe()
+        public virtual void Strafe( bool isEnable )
         {
-            isStrafing = !isStrafing;
+            isStrafing = isEnable;
         }
 
         public virtual void Jump()
@@ -160,58 +190,104 @@ namespace Invector.vCharacterController
             }
         }
 
+        public virtual void Targeting()
+        {
+            Ray ray = Camera.main.ScreenPointToRay( Input.mousePosition );
+
+            Debug.DrawRay( ray.origin, TargetingRange * ray.direction, Color.blue, 3.0f );
+
+            RaycastHit rayHit;
+            if ( Physics.Raycast( ray, out rayHit, TargetingRange ) == true )
+            {
+                currentTarget = rayHit.collider.GetComponent<Actor>();
+                if ( currentTarget != null )
+                {
+                    Debug.Log( "Target : " + currentTarget );
+                    Strafe( true );
+                    return;
+                }
+            }
+
+            currentTarget = null;
+            Strafe( false );
+        }
+
+        #endregion
+
+        #region Action
+
+        public virtual void SetActionCancelable()
+        {
+            isCancelableAction = true;
+        }
+
+        public virtual void StartAction()
+        {
+            moveSpeed = moveSpeedRate = 0.0f;
+            isBlockedAction = true;
+        }
+
         // Called from AnimationClip
         public override void EndAction()
         {
             base.EndAction();
-            remainComboDelay = AllowComboDelay;
+            comboDelay.Reset();
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
+            isCancelableAction = false;
+        }
+
+        public override void CancelAction()
+        {
+            base.CancelAction();
+            moveSpeedRate = 1.0f;
+            isBlockedAction = false;
+            isCancelableAction = false;
         }
 
         public override void BasicAttack()
         {
             if ( isBlockedAction == true )
             {
-                return;
+                if ( isCancelableAction == false )
+                {
+                    return;
+                }
+                CancelAction();
             }
 
-            if ( remainComboDelay <= 0.0f )
+            if ( comboDelay.Current <= 0.0f )
             {
-                currentComboCount = 0;
+                comboCount.Current = 0;
             }
             else
             {
-                ++currentComboCount;
-                if ( currentComboCount > MaxComboCount )
+                //++comboCount.Current;
+                if ( comboCount.Current > comboCount.Max )
                 {
-                    currentComboCount = 0;
+                    comboCount.Current = 0;
                 }
             }
 
-            moveSpeed = moveSpeedRate = 0.0f;
-            isBlockedAction = true;
+            StartAction();
             base.BasicAttack();
         }
 
         public override void DodgeAction()
         {
-            if ( remainDodgeCooldown > 0.0f )
+            if ( dodgeCooldown.Current > 0.0f )
             {
                 return;
             }
 
             if ( isBlockedAction == true )
             {
-                // 기존 액션 캔슬
-                EndAction();
+                CancelAction();
             }
 
-            moveSpeed = moveSpeedRate = 0.0f;
-            isBlockedAction = true;
-
+            StartAction();
             base.DodgeAction();
-            remainDodgeCooldown = DodgeCooldown;
+            dodgeCooldown.Reset();
         }
 
         // Called from AnimationClip
@@ -219,20 +295,20 @@ namespace Invector.vCharacterController
         {
             if ( input.sqrMagnitude <= 0.001 )
             {
-                moveDirection = _rigidbody.transform.forward;
+                moveDirection = transform.forward;
             }
             else
             {
                 UpdateMoveDirection( Camera.main.transform );
             }
-            _rigidbody.transform.rotation = Quaternion.LookRotation( moveDirection );
-            Vector3 targetPosition = _rigidbody.position + _rigidbody.transform.forward * DodgeDistance;
-            
+            transform.rotation = Quaternion.LookRotation( moveDirection );
+            Vector3 targetPosition = _rigidbody.position + transform.forward * DodgeDistance;
+
             WaitForFixedUpdate waitUpdate = new WaitForFixedUpdate();
             // 선후딜이 있어 Clip 길이와 정확히 일치하진 않음
             // Clip에서 EndAction() 호출하고 있어서 적당히 해도 될듯
             float maxMoveTime = dodgeAnimationClip.length / DodgeActionSpeed;
-            
+
             // ex) 0.5초안에 10m을 가야한다면, actionSpeed == 10.0 / 0.5 / 10.0 == 2.0
             float dodgeSpeedRate = DodgeDistance / dodgeAnimationClip.length / DodgeDistance;
             while ( maxMoveTime > 0.0f )
@@ -250,6 +326,14 @@ namespace Invector.vCharacterController
         protected void DodgeStop()
         {
             StopCoroutine( "DodgeMove" );
+        }
+
+        #endregion
+
+        public virtual void SpawnProjectile()
+        {
+            GameObject newObject =  Instantiate<GameObject>( projectile, transform.position + transform.forward * 0.5f + Vector3.up * 0.5f, transform.rotation );
+            newObject.GetComponent<Projectile>().parent = this;
         }
     }
 }
