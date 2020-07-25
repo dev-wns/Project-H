@@ -72,7 +72,6 @@ namespace Invector.vCharacterController
         #region Components
 
         internal Animator animator;
-        internal Rigidbody _rigidbody;                                                      // access the Rigidbody component
         internal PhysicMaterial frictionPhysics, maxFrictionPhysics, slippyPhysics;         // create PhysicMaterial for the Rigidbody
         internal CapsuleCollider _capsuleCollider;                                          // access CapsuleCollider information
 
@@ -128,8 +127,9 @@ namespace Invector.vCharacterController
             dodgeCooldown.SetZero();
         }
 
-        protected virtual void Update()
+        protected override void Update()
         {
+            base.Update();
             comboDelay.current -= Time.deltaTime;
             dodgeCooldown.current -= Time.deltaTime;
         }
@@ -170,9 +170,6 @@ namespace Invector.vCharacterController
             slippyPhysics.dynamicFriction = 0f;
             slippyPhysics.frictionCombine = PhysicMaterialCombine.Minimum;
 
-            // rigidbody info
-            _rigidbody = GetComponent<Rigidbody>();
-
             // capsule collider info
             _capsuleCollider = GetComponent<CapsuleCollider>();
 
@@ -207,7 +204,7 @@ namespace Invector.vCharacterController
             // calculate input smooth
             inputSmooth = Vector3.Lerp(inputSmooth, input, (isStrafing ? strafeSpeed.movementSmooth : freeSpeed.movementSmooth) * Time.deltaTime);
 
-            if ( isGrounded == false || isJumping == true )
+            if ( isGrounded == false || isJumping == true || MoveBlockingTime.Current > 0.0f )
             {
                 return;
             }
@@ -330,6 +327,11 @@ namespace Invector.vCharacterController
             moveDirection.y = 0;
             moveDirection.x = Mathf.Clamp( moveDirection.x, -1f, 1f );
             moveDirection.z = Mathf.Clamp( moveDirection.z, -1f, 1f );
+
+            if ( MoveBlockingTime.Current > 0.0f )
+            {
+                return;
+            }
 
             Vector3 targetPosition = _rigidbody.position + ( moveDirection * airSpeed ) * Time.deltaTime;
             Vector3 targetVelocity = ( targetPosition - transform.position ) / Time.deltaTime;

@@ -14,20 +14,29 @@ public class Actor : MonoBehaviour
 
     public ETeamType TeamType;
 
+    internal Rigidbody _rigidbody;
+
     #region UnityEvent
 
     protected virtual void Awake()
     {
+        _rigidbody = GetComponent<Rigidbody>();
+
         HP.Reset();
         AttackPower.Reset();
     }
 
-    protected void OnTriggerEnter( Collider other )
-    {
-
-    }
-
     #endregion
+
+    public virtual void SetVelocity( Vector3 velocity )
+    {
+        if ( _rigidbody == null )
+        {
+            return;
+        }
+
+        _rigidbody.velocity = velocity;
+    }
 }
 
 public enum ETeamType

@@ -11,8 +11,25 @@ public class Character : Actor
     [HideInInspector]
     public Actor currentTarget;
 
+    public StatusFloat MoveBlockingTime;
+
+    #region UnityEvent
+
+    protected virtual void Update()
+    {
+        MoveBlockingTime.current -= Time.deltaTime;
+    }
+
+    #endregion
+
     public virtual bool IsTargeting()
     {
         return currentTarget != null;
+    }
+
+    public override void SetVelocity( Vector3 velocity )
+    {
+        MoveBlockingTime.Reset();
+        base.SetVelocity( velocity );
     }
 }
