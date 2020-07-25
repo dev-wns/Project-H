@@ -3140,6 +3140,9 @@ MonoBehaviour:
   TeamType: 1
   TargetingRange: 15
   currentTarget: {fileID: 0}
+  MoveBlockingTime:
+    max: 0.1
+    current: 0
   comboCount:
     max: 2
     current: 0
