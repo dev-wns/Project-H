@@ -125936,7 +125936,7 @@ AnimationClip:
     messageOptions: 0
   - time: 0.6666667
     functionName: EndAction
-    data: 
+    data: Combo2
     objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
     floatParameter: 0
     intParameter: 0

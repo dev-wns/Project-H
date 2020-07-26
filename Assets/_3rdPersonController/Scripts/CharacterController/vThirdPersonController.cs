@@ -221,26 +221,27 @@ namespace Invector.vCharacterController
             isCancelableAction = true;
         }
 
-        public virtual void StartAction()
+        public virtual void StartAction( string actionId )
         {
+            currentActionId = actionId;
             moveSpeed = moveSpeedRate = 0.0f;
             isBlockedAction = true;
             isCancelableAction = false;
         }
 
         // Called from AnimationClip
-        public override void EndAction()
+        public override bool EndAction( string actionId )
         {
-            if ( isBlockedAction == false )
+            if ( base.EndAction( actionId ) == false )
             {
-                return;
+                return false;
             }
 
-            base.EndAction();
             comboDelay.Reset();
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
+            return true;
         }
 
         public override void CancelAction()
@@ -267,7 +268,7 @@ namespace Invector.vCharacterController
             }
             ++comboCount.Current;
 
-            StartAction();
+            StartAction( "Combo" + comboCount.Current );
             base.BasicAttack();
         }
 
@@ -283,7 +284,7 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            StartAction();
+            StartAction( "Dodge" );
             base.DodgeAction();
             dodgeCooldown.Reset();
         }
@@ -317,7 +318,7 @@ namespace Invector.vCharacterController
                 yield return waitUpdate;
             }
 
-            EndAction();
+            EndAction( "Dodge" );
         }
 
         // Called from AnimationClip

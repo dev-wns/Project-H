@@ -1,4 +1,5 @@
 ﻿
+using System;
 using UnityEngine;
 
 namespace Invector.vCharacterController
@@ -61,9 +62,15 @@ namespace Invector.vCharacterController
 
         #region Action
 
-        public virtual void EndAction()
+        public virtual bool EndAction( string actionId )
         {
+            if ( currentActionId.Equals( actionId ) == false )
+            {
+                return false;
+            }
+
             animator.SetTrigger( vAnimatorParameters.EndAction );
+            return true;
         }
 
         public virtual void CancelAction()

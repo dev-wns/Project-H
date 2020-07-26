@@ -17,6 +17,9 @@ namespace Invector.vCharacterController
         public float DodgeActionSpeed = 1.0f;
         public StatusFloat dodgeCooldown;
 
+        [HideInInspector]
+        public string currentActionId;
+
         #region Inspector Variables
 
         [Header( "- Movement" )]
