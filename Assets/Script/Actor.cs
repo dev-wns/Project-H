@@ -81,7 +81,7 @@ public struct StatusFloat
             }
 
             float old = current;
-            current = Mathf.Clamp( value, 0, Max );
+            current = Mathf.Clamp( value, 0.0f, Max );
 
             OnChangeCurrent?.Invoke( old, current );
         }

@@ -42,7 +42,6 @@ namespace Invector.vCharacterController
         protected virtual void Update()
         {
             InputHandle();                  // update the input methods
-            controller.UpdateAnimator();            // updates the Animator Parameters
         }
 
         public virtual void OnAnimatorMove()

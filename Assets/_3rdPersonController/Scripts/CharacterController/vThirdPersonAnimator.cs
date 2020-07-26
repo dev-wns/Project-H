@@ -13,16 +13,19 @@ namespace Invector.vCharacterController
 
         #endregion  
 
-        public virtual void UpdateAnimator()
+        protected override void Update()
         {
+            base.Update();
+
             if ( animator == null || animator.enabled == false )
             {
                 return;
             }
 
+            animator.SetBool( vAnimatorParameters.IsGrounded, isGrounded );
             animator.SetBool( vAnimatorParameters.IsStrafing, isStrafing ); ;
             animator.SetBool( vAnimatorParameters.IsSprinting, isSprinting );
-            animator.SetBool( vAnimatorParameters.IsGrounded, isGrounded );
+            animator.SetBool( vAnimatorParameters.IsBlockedAction, isBlockedAction );
             animator.SetFloat( vAnimatorParameters.GroundDistance, groundDistance );
 
             if ( isStrafing == true )
@@ -35,6 +38,10 @@ namespace Invector.vCharacterController
                 animator.SetFloat( vAnimatorParameters.InputVertical, stopMove == true ? 0 : verticalSpeed, freeSpeed.animationSmooth, Time.deltaTime );
             }
 
+            if ( isBlockedAction == true )
+            {
+                inputMagnitude = 0.0f;
+            }
             animator.SetFloat( vAnimatorParameters.InputMagnitude, stopMove == true ? 0f : inputMagnitude, isStrafing == true ? strafeSpeed.animationSmooth : freeSpeed.animationSmooth, Time.deltaTime );
         }
 
@@ -87,6 +94,7 @@ namespace Invector.vCharacterController
         public static int IsGrounded = Animator.StringToHash( "IsGrounded" );
         public static int IsStrafing = Animator.StringToHash( "IsStrafing" );
         public static int IsSprinting = Animator.StringToHash( "IsSprinting" );
+        public static int IsBlockedAction = Animator.StringToHash( "IsBlockedAction" );
         public static int GroundDistance = Animator.StringToHash( "GroundDistance" );
         public static int Attack = Animator.StringToHash( "Attack" );
         public static int ComboCount = Animator.StringToHash( "ComboCount" );

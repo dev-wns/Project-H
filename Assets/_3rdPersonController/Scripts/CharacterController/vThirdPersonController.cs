@@ -225,11 +225,17 @@ namespace Invector.vCharacterController
         {
             moveSpeed = moveSpeedRate = 0.0f;
             isBlockedAction = true;
+            isCancelableAction = false;
         }
 
         // Called from AnimationClip
         public override void EndAction()
         {
+            if ( isBlockedAction == false )
+            {
+                return;
+            }
+
             base.EndAction();
             comboDelay.Reset();
             moveSpeedRate = 1.0f;
@@ -240,7 +246,6 @@ namespace Invector.vCharacterController
         public override void CancelAction()
         {
             base.CancelAction();
-            moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
         }
@@ -256,18 +261,11 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            if ( comboDelay.Current <= 0.0f )
+            if ( comboCount.Current >= comboCount.Max )
             {
-                comboCount.Current = 0;
+                comboCount.SetZero();
             }
-            else
-            {
-                //++comboCount.Current;
-                if ( comboCount.Current > comboCount.Max )
-                {
-                    comboCount.Current = 0;
-                }
-            }
+            ++comboCount.Current;
 
             StartAction();
             base.BasicAttack();

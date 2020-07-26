@@ -100,6 +100,7 @@ public class Projectile : MonoBehaviour
             return;
         }
 
+        float prevHP = target.HP.Current;
         target.HP.Current -= GetTotalDamage();
         target.SetVelocity( transform.rotation * forceDirection * forcePower );
 
@@ -107,7 +108,10 @@ public class Projectile : MonoBehaviour
         ++info.hitCount;
         info.hitDelay = reHitDelay;
 
-        Debug.Log( other.gameObject + ", hp = " + target.HP.Current + ", count = " + hitInfos[ other.gameObject ].hitCount );
+        if ( Mathf.Abs( prevHP - target.HP.Current ) > Mathf.Epsilon )
+        {
+            Debug.Log( other.gameObject + ", hp = " + target.HP.Current + ", count = " + hitInfos[ other.gameObject ].hitCount );
+        }
     }
 
     protected float GetTotalDamage()
