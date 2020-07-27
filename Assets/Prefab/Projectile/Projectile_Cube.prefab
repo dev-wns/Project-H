@@ -109,12 +109,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   parent: {fileID: 0}
-  maxHitCount: 2
+  maxHitCount: 3
   reHitDelay: 0.05
   duration:
     max: 1
     current: 0
   forceMode: 2
-  forceDirection: {x: 0, y: 1, z: 0.5}
-  forcePower: 1.5
+  forceDirection: {x: 0, y: 0.5, z: 1}
+  forcePower: 5
   damage: 5

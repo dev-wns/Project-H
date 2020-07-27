@@ -3152,7 +3152,7 @@ MonoBehaviour:
   DodgeDistance: 10
   DodgeActionSpeed: 1.4
   dodgeCooldown:
-    max: 0.95
+    max: 1.5
     current: 0
   currentActionId: 
   useRootMotion: 0
