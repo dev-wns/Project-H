@@ -12,6 +12,8 @@ namespace Invector.vCharacterController
 
         public GameObject projectile;
 
+        protected float forwardInputAxis;
+
         #region UnityEvent
 
         protected override void Awake()
@@ -225,6 +227,7 @@ namespace Invector.vCharacterController
         {
             currentActionId = actionId;
             moveSpeed = moveSpeedRate = 0.0f;
+            forwardInputAxis = 0.0f;
             isBlockedAction = true;
             isCancelableAction = false;
         }
@@ -329,9 +332,22 @@ namespace Invector.vCharacterController
 
         #endregion
 
+        public override void MoveForward( float power )
+        {
+            // -1 ~ 1 -> 0 ~ 1
+            // 앞 = 1, 중립 = 0.5, 뒤 = 0
+            forwardInputAxis = ( Vector3.Dot( transform.forward, transform.rotation * input ) + 1.0f ) * 0.5f;
+            base.MoveForward( power * forwardInputAxis );
+        }
+
+        public virtual Vector3 GetProjectileSpawnPosition( float baseDistance, float inputDistance )
+        {
+            return transform.position + transform.forward * ( inputDistance * forwardInputAxis + baseDistance ) + ( Vector3.up * colliderHeight * 0.5f );
+        }
+
         public virtual void SpawnProjectile()
         {
-            GameObject newObject =  Instantiate<GameObject>( projectile, transform.position + transform.forward * 0.5f + Vector3.up * 0.5f, transform.rotation );
+            GameObject newObject =  Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( 0.6f, 0.8f ), transform.rotation );
             newObject.GetComponent<Projectile>().parent = this;
         }
     }
