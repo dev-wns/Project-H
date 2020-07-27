@@ -12,6 +12,8 @@ namespace Invector.vCharacterController
 
         public GameObject projectile;
 
+        protected float forwardInputAxis;
+
         #region UnityEvent
 
         protected override void Awake()
@@ -221,26 +223,33 @@ namespace Invector.vCharacterController
             isCancelableAction = true;
         }
 
-        public virtual void StartAction()
+        public virtual void StartAction( string actionId )
         {
+            currentActionId = actionId;
             moveSpeed = moveSpeedRate = 0.0f;
+            forwardInputAxis = 0.0f;
             isBlockedAction = true;
+            isCancelableAction = false;
         }
 
         // Called from AnimationClip
-        public override void EndAction()
+        public override bool EndAction( string actionId )
         {
-            base.EndAction();
+            if ( base.EndAction( actionId ) == false )
+            {
+                return false;
+            }
+
             comboDelay.Reset();
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
+            return true;
         }
 
         public override void CancelAction()
         {
             base.CancelAction();
-            moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
         }
@@ -256,20 +265,13 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            if ( comboDelay.Current <= 0.0f )
+            if ( comboCount.Current >= comboCount.Max )
             {
-                comboCount.Current = 0;
+                comboCount.SetZero();
             }
-            else
-            {
-                //++comboCount.Current;
-                if ( comboCount.Current > comboCount.Max )
-                {
-                    comboCount.Current = 0;
-                }
-            }
+            ++comboCount.Current;
 
-            StartAction();
+            StartAction( "Combo" + comboCount.Current );
             base.BasicAttack();
         }
 
@@ -285,7 +287,7 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            StartAction();
+            StartAction( "Dodge" );
             base.DodgeAction();
             dodgeCooldown.Reset();
         }
@@ -319,7 +321,7 @@ namespace Invector.vCharacterController
                 yield return waitUpdate;
             }
 
-            EndAction();
+            EndAction( "Dodge" );
         }
 
         // Called from AnimationClip
@@ -330,9 +332,22 @@ namespace Invector.vCharacterController
 
         #endregion
 
+        public override void MoveForward( float power )
+        {
+            // -1 ~ 1 -> 0 ~ 1
+            // 앞 = 1, 중립 = 0.5, 뒤 = 0
+            forwardInputAxis = ( Vector3.Dot( transform.forward, transform.rotation * input ) + 1.0f ) * 0.5f;
+            base.MoveForward( power * forwardInputAxis );
+        }
+
+        public virtual Vector3 GetProjectileSpawnPosition( float baseDistance, float inputDistance )
+        {
+            return transform.position + transform.forward * ( inputDistance * forwardInputAxis + baseDistance ) + ( Vector3.up * colliderHeight * 0.5f );
+        }
+
         public virtual void SpawnProjectile()
         {
-            GameObject newObject =  Instantiate<GameObject>( projectile, transform.position + transform.forward * 0.5f + Vector3.up * 0.5f, transform.rotation );
+            GameObject newObject =  Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( 0.6f, 0.8f ), transform.rotation );
             newObject.GetComponent<Projectile>().parent = this;
         }
     }

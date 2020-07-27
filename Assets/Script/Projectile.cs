@@ -1,14 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Invector.vCharacterController;
 using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-    Collider myCollider;
     public Actor parent;
+    
+    public class HitInfo
+    {
+        public uint hitCount;
+        public float hitDelay;
+    }
+    protected Dictionary<GameObject, HitInfo> hitInfos = new Dictionary<GameObject, HitInfo>();
 
     [Header( "- Hit" )]
-    public StatusFloat reHitDelay;
+    public uint maxHitCount;
+    public float reHitDelay;
     public StatusFloat duration;
 
     [Header( "- Force" )]
@@ -21,9 +30,7 @@ public class Projectile : MonoBehaviour
 
     void Awake()
     {
-        myCollider = gameObject.GetComponent<Collider>();
         duration.Reset();
-        reHitDelay.SetZero();
         forceDirection.Normalize();
     }
 
@@ -39,29 +46,45 @@ public class Projectile : MonoBehaviour
             duration.current -= Time.deltaTime;
         }
 
-        reHitDelay.current -= Time.deltaTime;
+        foreach ( GameObject key in hitInfos.Keys )
+        {
+            hitInfos[ key ].hitDelay -= Time.deltaTime;
+        }
     }
 
     protected void OnTriggerEnter( Collider other )
     {
-        if ( reHitDelay.Current <= 0.0f )
+        if ( hitInfos.ContainsKey( other.gameObject ) == false )
         {
+            hitInfos.Add( other.gameObject, new HitInfo() );
             OnHit( other );
         }
     }
 
     protected void OnTriggerStay( Collider other )
     {
-        if ( reHitDelay.Max <= 0.0f )
+        if ( reHitDelay <= Mathf.Epsilon || hitInfos.ContainsKey( other.gameObject ) == false )
         {
             return;
         }
 
-        if ( reHitDelay.Current <= 0.0f )
+        HitInfo info = hitInfos[ other.gameObject ];
+        if ( info.hitDelay <= 0.0f && ( info.hitCount <= maxHitCount || maxHitCount == 0 ) )
         {
             OnHit( other );
         }
     }
+
+    protected void OnTriggerExit( Collider other )
+    {
+        if ( maxHitCount > 0 || hitInfos.ContainsKey( other.gameObject ) == false )
+        {
+            return;
+        }
+
+        hitInfos.Remove( other.gameObject );
+    }
+
 
     protected void OnHit( Collider other )
     {
@@ -77,23 +100,27 @@ public class Projectile : MonoBehaviour
             return;
         }
 
-        float totalDamage = damage;
-        if ( parent != null )
+        float prevHP = target.HP.Current;
+        target.HP.Current -= GetTotalDamage();
+        target.SetVelocity( transform.rotation * forceDirection * forcePower );
+
+        HitInfo info = hitInfos[ other.gameObject ];
+        ++info.hitCount;
+        info.hitDelay = reHitDelay;
+
+        if ( Mathf.Abs( prevHP - target.HP.Current ) > Mathf.Epsilon )
         {
-            totalDamage *= parent.AttackPower.Current;
+            Debug.Log( other.gameObject + ", hp = " + target.HP.Current + ", count = " + hitInfos[ other.gameObject ].hitCount );
+        }
+    }
+
+    protected float GetTotalDamage()
+    {
+        if ( parent == null )
+        {
+            return damage;
         }
 
-        target.HP.Current -= totalDamage;
-
-        if ( forcePower > 0.0f )
-        {
-            Rigidbody rigidBody = other.GetComponent<Rigidbody>();
-            Vector3 newDirection = transform.rotation * forceDirection;
-            rigidBody?.AddForce( newDirection * forcePower, forceMode );
-        }
-
-        Debug.Log( other.gameObject + ", hp = " + target.HP.Current );
-
-        reHitDelay.Reset();
+        return damage * parent.AttackPower.Current;
     }
 }

@@ -42,7 +42,6 @@ namespace Invector.vCharacterController
         protected virtual void Update()
         {
             InputHandle();                  // update the input methods
-            controller.UpdateAnimator();            // updates the Animator Parameters
         }
 
         public virtual void OnAnimatorMove()
@@ -84,12 +83,17 @@ namespace Invector.vCharacterController
 
         protected virtual void InputHandle()
         {
-            MoveInput();
-            CameraInput();
-            SprintInput();
-            StrafeInput();
-            JumpInput();
-            ActionInput();
+            if ( Cursor.lockState == CursorLockMode.Locked )
+            {
+                MoveInput();
+                CameraInput();
+                SprintInput();
+                StrafeInput();
+                JumpInput();
+                ActionInput();
+            }
+
+            UiInput();
         }
 
         public virtual void MoveInput()
@@ -206,6 +210,21 @@ namespace Invector.vCharacterController
             if ( Input.GetButtonDown( targetingInput ) == true )
             {
                 controller.Targeting();
+            }
+        }
+
+        protected virtual void UiInput()
+        {
+            if ( Input.GetKeyDown( KeyCode.Return ) == true )
+            {
+                if ( Cursor.lockState == CursorLockMode.Locked )
+                {
+                    Cursor.lockState = Cursor.lockState == CursorLockMode.Locked ? CursorLockMode.None : CursorLockMode.Locked;
+                }
+                else
+                {
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
             }
         }
 
