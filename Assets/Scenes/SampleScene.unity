@@ -904,10 +904,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686c0286c24119f469b39a50d046b331, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inputMessage: {fileID: 1295181716}
   messageList: []
   textList: []
-  chatPanel: {fileID: 2002136814}
+  inputMessage: {fileID: 1295181716}
+  textContents: {fileID: 2002136814}
   textObject: {fileID: 2445547361412755946, guid: 22dcaa361a7f23b4397c953740be016a, type: 3}
 --- !u!1 &316249031
 GameObject:

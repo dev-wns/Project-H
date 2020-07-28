@@ -63,7 +63,7 @@ public class GameMain : MonoBehaviour
         Message newMessage = new Message();
         newMessage.text = text;
 
-        GameObject newText = Instantiate( textObject, chatPanel.transform );
+        GameObject newText = Instantiate( textObject, textContents.transform );
         newMessage.textObject = newText.GetComponent<Text>();
         newMessage.textObject.text = newMessage.text;
         messageList.Add( newMessage );
