@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,5 +32,10 @@ public class Character : Actor
     {
         MoveBlockingTime.Reset();
         base.SetVelocity( velocity );
+    }
+
+    public virtual void MoveForward( float power )
+    {
+        SetVelocity( transform.forward * power );
     }
 }
