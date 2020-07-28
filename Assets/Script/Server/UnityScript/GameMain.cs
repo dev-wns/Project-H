@@ -3,65 +3,73 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using UnityEngine;
+using UnityEngine.UI;
+
+[Serializable]
+public struct ChatMessage
+{
+    public string text;
+    public Text textObject;
+}
 
 public class GameMain : MonoBehaviour
 {
-    string inputText;
-    List<string> receivedTexts;
     NetworkManager networkManager;
 
-    Vector2 currentScrollpos = new Vector2();
+    public InputField inputMessage;
+    [SerializeField]
+    public List<Message> messageList = new List<Message>();
+    public List<string> textList = new List<string>();
+    // 
+    public GameObject chatPanel;
+    // 복사할 텍스트 오브젝트 객체
+    public GameObject textObject;
+
+    private int maxMessageCount = 25;
 
     private void Awake()
     {
-        this.inputText = "";
-        this.receivedTexts = new List<string>();
-        this.networkManager = GameObject.Find( "NetworkManager" ).GetComponent<NetworkManager>(); ;
+        this.networkManager = GameObject.Find( "NetworkManager" ).GetComponent<NetworkManager>();
     }
 
-    public void OnReceiveChatMessage( string text )
+    private void Update()
     {
-        this.receivedTexts.Add( text );
-        this.currentScrollpos.y = float.PositiveInfinity;
-    }
-
-    private void OnGUI()
-    {
-        GUILayout.BeginVertical();
-        currentScrollpos = GUILayout.BeginScrollView( 
-            currentScrollpos,
-            GUILayout.MaxWidth( Screen.width ),
-            GUILayout.MinWidth( Screen.width ),
-            GUILayout.MaxHeight( Screen.height - 100 ),
-            GUILayout.MinHeight( Screen.height - 100 ) );
-
-        foreach(string text in this.receivedTexts )
+        if ( textList.Count > 0 )
         {
-            GUILayout.BeginHorizontal();
-            GUI.skin.label.wordWrap = true;
-            GUILayout.Label( text );
-            GUILayout.EndHorizontal();
+            MakeMessage( textList[0] );
+            textList.Remove( textList[0] );
+        }
+    }
+
+    public void MakeMessage( string text )
+    {
+        // 최대 수치를 넘어가면 하나의 메세지를 지웁니다.
+        if ( messageList.Count >= maxMessageCount )
+        {
+            Destroy( messageList[0].textObject.gameObject );
+            messageList.Remove( messageList[0] );
         }
 
-        GUILayout.EndScrollView();
-        GUILayout.EndVertical();
+        // 새로운 메세지 생성
+        Message newMessage = new Message();
+        newMessage.text = text;
 
-        // Input
-        GUILayout.BeginHorizontal();
-        this.inputText = GUILayout.TextField( this.inputText,
-                         GUILayout.MaxWidth( Screen.width - 100 ),
-                         GUILayout.MinWidth( Screen.width - 100 ),
-                         GUILayout.MaxHeight( 50 ), GUILayout.MinHeight( 50 ) );
-        if ( GUILayout.Button("Send", 
-            GUILayout.MaxWidth(100), GUILayout.MinWidth(100), 
-            GUILayout.MaxHeight( 50 ), GUILayout.MinHeight( 50 ) ) )
-            {
-                Packet msg = Packet.Create( ( short )PROTOCOL.CHAT_MSG_REQ );
-                msg.Push( this.inputText );
-                this.networkManager.Send( msg );
-                this.inputText = "";
-            }
-        GUILayout.EndHorizontal();
+        GameObject newText = Instantiate( textObject, chatPanel.transform );
+        newMessage.textObject = newText.GetComponent<Text>();
+        newMessage.textObject.text = newMessage.text;
+
+        messageList.Add( newMessage );
+
+        // 생성완료된 메세지를 리스트에서 지웁니다.
+        textList.Remove( text );
+    }
+
+    public void SendChatMessageToServer()
+    {
+        Packet msg = Packet.Create( ( short )PROTOCOL.CHAT_MSG_REQ );
+        msg.Push( inputMessage.text );
+        networkManager.Send( msg );
+        inputMessage.text = "";
     }
 }
 

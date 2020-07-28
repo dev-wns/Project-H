@@ -332,12 +332,12 @@ namespace Invector.vCharacterController
 
         #endregion
 
-        public override void MoveForward( float power )
+        public void MoveForward( float power )
         {
             // -1 ~ 1 -> 0 ~ 1
             // 앞 = 1, 중립 = 0.5, 뒤 = 0
             forwardInputAxis = ( Vector3.Dot( transform.forward, transform.rotation * input ) + 1.0f ) * 0.5f;
-            base.MoveForward( power * forwardInputAxis );
+            MoveForward( power * forwardInputAxis );
         }
 
         public virtual Vector3 GetProjectileSpawnPosition( float baseDistance, float inputDistance )

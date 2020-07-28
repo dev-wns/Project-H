@@ -45,7 +45,7 @@ public class NetworkManager : MonoBehaviour
                     this.receivedMessage += "DisConnected\n";
                 } break;
 
-            default: break;
+            default: { } break;
         }
     }
 
@@ -58,7 +58,7 @@ public class NetworkManager : MonoBehaviour
             case PROTOCOL.CHAT_MSG_ACK:
                 {
                     string text = msg.PopString();
-                    GameObject.Find( "ServerMain" ).GetComponent<GameMain>().OnReceiveChatMessage( text );
+                    GameObject.Find( "ServerMain" ).GetComponent<GameMain>().MakeMessage( text );
                 } break;
             default: break;
         }
