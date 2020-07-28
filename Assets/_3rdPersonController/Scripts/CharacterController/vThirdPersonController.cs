@@ -334,9 +334,11 @@ namespace Invector.vCharacterController
 
         public override void MoveForward( float power )
         {
+            float forwardDot = Vector3.Dot( transform.forward, Camera.main.transform.rotation * input );
+            forwardDot = Mathf.Clamp( forwardDot, 0.0f, 1.0f );
             // -1 ~ 1 -> 0 ~ 1
             // 앞 = 1, 중립 = 0.5, 뒤 = 0
-            forwardInputAxis = ( Vector3.Dot( transform.forward, Camera.main.transform.rotation * input.normalized ) + 1.0f ) * 0.5f;
+            forwardInputAxis = ( forwardDot + 1.0f ) * 0.5f;
             base.MoveForward( power * forwardInputAxis );
         }
 
