@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
-public struct ChatMessage
+public struct Message
 {
     public string text;
     public Text textObject;
@@ -16,12 +16,16 @@ public class GameMain : MonoBehaviour
 {
     NetworkManager networkManager;
 
-    public InputField inputMessage;
     [SerializeField]
     public List<Message> messageList = new List<Message>();
     public List<string> textList = new List<string>();
-    // 
-    public GameObject chatPanel;
+
+    // 인풋 필드. 안의 Text내용을 꺼내옵니다.
+    public InputField inputMessage;
+    // 복사한 텍스트들의 부모가 되는 객체
+    // Content Size Fitter, Vertical Layout Group 컴포넌트를 넣어논 객체로써
+    // 자동으로 위아래 간격을 맞춰줍니다.
+    public GameObject textContents;
     // 복사할 텍스트 오브젝트 객체
     public GameObject textObject;
 
@@ -41,26 +45,29 @@ public class GameMain : MonoBehaviour
         }
     }
 
+    public void ChatEnabled( bool enable )
+    {
+        if ( inputMessage == null ) throw new ArgumentNullException( "The appended object cannot be null" );
+
+        inputMessage.enabled = enable;
+    }
+
     public void MakeMessage( string text )
     {
-        // 최대 수치를 넘어가면 하나의 메세지를 지웁니다.
         if ( messageList.Count >= maxMessageCount )
         {
             Destroy( messageList[0].textObject.gameObject );
             messageList.Remove( messageList[0] );
         }
 
-        // 새로운 메세지 생성
         Message newMessage = new Message();
         newMessage.text = text;
 
         GameObject newText = Instantiate( textObject, chatPanel.transform );
         newMessage.textObject = newText.GetComponent<Text>();
         newMessage.textObject.text = newMessage.text;
-
         messageList.Add( newMessage );
 
-        // 생성완료된 메세지를 리스트에서 지웁니다.
         textList.Remove( text );
     }
 
