@@ -1,4 +1,6 @@
-﻿public enum PROTOCOL : short
+﻿
+
+public enum PROTOCOL : short
 {
     BEGIN = 0,
 

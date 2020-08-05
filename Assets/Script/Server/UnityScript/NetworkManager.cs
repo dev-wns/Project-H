@@ -28,7 +28,7 @@ public class NetworkManager : MonoBehaviour
 
     void OnStatusChanged( NETWORK_EVENT status )
     {
-        switch(status )
+        switch( status )
         {
             case NETWORK_EVENT.CONNECTED:
                 {
@@ -45,7 +45,7 @@ public class NetworkManager : MonoBehaviour
                     this.receivedMessage += "DisConnected\n";
                 } break;
 
-            default: { } break;
+            default: break;
         }
     }
 
@@ -59,6 +59,10 @@ public class NetworkManager : MonoBehaviour
                 {
                     string text = msg.PopString();
                     GameObject.Find( "ServerMain" ).GetComponent<GameMain>().MakeMessage( text );
+                } break;
+            case PROTOCOL.MOVE_ACK:
+                {
+
                 } break;
             default: break;
         }
