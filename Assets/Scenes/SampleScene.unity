@@ -3436,10 +3436,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Unity-chan
       objectReference: {fileID: 0}
-    - target: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4956249427611764263, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

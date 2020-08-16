@@ -138332,28 +138332,28 @@ AnimationClip:
   - time: 0.3
     functionName: MoveForward
     data: 
-    objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 6
     intParameter: 0
     messageOptions: 0
   - time: 0.33333334
     functionName: SpawnProjectile
-    data: 
-    objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
+    data: '{"x":0,"y":0,"z":0.8}'
+    objectReferenceParameter: {fileID: 21277000074054642, guid: b5791759d6e701b4594f16da14e54bc4, type: 3}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.4
     functionName: SetActionCancelable
     data: 
-    objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 0.76666665
     functionName: EndAction
     data: Combo1
-    objectReferenceParameter: {fileID: 4956249427611764257, guid: da769933abfeeda43b4ff3f82f9beb10, type: 3}
+    objectReferenceParameter: {fileID: 7400000}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

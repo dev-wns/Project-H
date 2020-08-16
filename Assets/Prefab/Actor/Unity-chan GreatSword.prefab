@@ -3144,10 +3144,10 @@ MonoBehaviour:
     max: 0.1
     current: 0
   comboCount:
-    max: 2
+    max: 4
     current: 0
   comboDelay:
-    max: 0.4
+    max: 0.2
     current: 0
   DodgeDistance: 10
   DodgeActionSpeed: 1.4
@@ -3193,7 +3193,6 @@ MonoBehaviour:
   groundMaxDistance: 0.5
   slopeLimit: 75
   dodgeAnimationClip: {fileID: 7400000, guid: 722cf752075121f4088d2b57c8b38de9, type: 2}
-  projectile: {fileID: 21277000074054642, guid: b5791759d6e701b4594f16da14e54bc4, type: 3}
 --- !u!114 &4956249427611764260
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization.Json;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,9 +9,14 @@ namespace Invector.vCharacterController
 {
     public class vThirdPersonController : vThirdPersonAnimator
     {
-        public AnimationClip dodgeAnimationClip;
+        public enum ESpawnType
+        {
+            ATTACH,
+            WORLD,
+            LOCAL,
+        }
 
-        public GameObject projectile;
+        public AnimationClip dodgeAnimationClip;
 
         protected float forwardInputAxis;
 
@@ -258,7 +264,7 @@ namespace Invector.vCharacterController
         {
             if ( isBlockedAction == true )
             {
-                if ( isCancelableAction == false )
+                if ( isCancelableAction == false || comboCount.Current >= comboCount.Max )
                 {
                     return;
                 }
@@ -271,7 +277,15 @@ namespace Invector.vCharacterController
             }
             ++comboCount.Current;
 
-            StartAction( "Combo" + comboCount.Current );
+            // 임시조치. 하드코딩 없게 구조 잡도록
+            if ( comboCount.Current > 2 )
+            {
+                StartAction( "Combo" + ( comboCount.Current - 2 ) );
+            }
+            else
+            {
+                StartAction( "Combo" + comboCount.Current );
+            }
             base.BasicAttack();
         }
 
@@ -342,14 +356,52 @@ namespace Invector.vCharacterController
             base.MoveForward( forwardInputAxis * power );
         }
 
-        public virtual Vector3 GetProjectileSpawnPosition( float baseDistance, float inputDistance )
+        public virtual Vector3 GetProjectileSpawnPosition( Vector3 spawnPosition, float inputDistance )
         {
-            return transform.position + transform.forward * ( inputDistance * forwardInputAxis + baseDistance ) + ( Vector3.up * colliderHeight * 0.5f );
+            // spawnPosition + 전진 거리 + 중심 위치
+            return spawnPosition + ( inputDistance * forwardInputAxis * transform.forward ) + ( Vector3.up * colliderHeight * 0.5f );
         }
 
-        public virtual void SpawnProjectile()
+        public virtual void SpawnProjectile( AnimationEvent param )
         {
-            GameObject newObject =  Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( 0.6f, 0.8f ), transform.rotation );
+            GameObject projectile = param.objectReferenceParameter as GameObject;
+            if ( projectile == null )
+            {
+                Debug.LogError( "projectile reference is null." );
+                return;
+            }
+
+            Vector3 spawnPosition = Vector3.zero;
+            if ( param.stringParameter.Length > 0 )
+            {
+                spawnPosition = JsonUtility.FromJson<Vector3>( param.stringParameter );
+            }
+
+            GameObject newObject = null;
+            float inputDistance = param.floatParameter;
+
+            ESpawnType spawnType = ( ESpawnType )param.intParameter;
+            switch ( spawnType )
+            {
+                case ESpawnType.ATTACH:
+                {
+                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( transform.position + ( transform.rotation * spawnPosition ), inputDistance ), transform.rotation, transform );
+                }
+                break;
+
+                case ESpawnType.LOCAL:
+                {
+                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( transform.position + ( transform.rotation * spawnPosition ), inputDistance ), transform.rotation );
+                }
+                break;
+
+                case ESpawnType.WORLD:
+                {
+                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( spawnPosition, inputDistance ), transform.rotation );
+                }
+                break;
+            }
+            
             newObject.GetComponent<Projectile>().parent = this;
         }
     }
