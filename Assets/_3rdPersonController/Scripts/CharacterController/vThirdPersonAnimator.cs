@@ -6,11 +6,14 @@ namespace Invector.vCharacterController
 {
     public class vThirdPersonAnimator : vThirdPersonMotor
     {
-        #region Variables                
+        #region Variables
 
         public const float walkSpeed = 0.5f;
         public const float runningSpeed = 1f;
         public const float sprintSpeed = 1.5f;
+
+        protected int currentStateHash;
+        protected float forwardInputAxis;
 
         #endregion  
 
@@ -62,15 +65,12 @@ namespace Invector.vCharacterController
 
         #region Action
 
-        public virtual bool EndAction( string actionId )
+        public virtual void EndAction( int stateHash )
         {
-            if ( currentActionId.Equals( actionId ) == false )
+            if ( stateHash == 0 )
             {
-                return false;
+                animator.SetTrigger( vAnimatorParameters.EndAction );
             }
-
-            animator.SetTrigger( vAnimatorParameters.EndAction );
-            return true;
         }
 
         public virtual void CancelAction()

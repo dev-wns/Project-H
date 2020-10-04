@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization.Json;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,7 +19,7 @@ namespace Invector.vCharacterController
 
         public AnimationClip dodgeAnimationClip;
 
-        protected float forwardInputAxis;
+        private int actionStackCount;
 
         #region UnityEvent
 
@@ -229,9 +230,11 @@ namespace Invector.vCharacterController
             isCancelableAction = true;
         }
 
-        public virtual void StartAction( string actionId )
+        public virtual void StartAction( int stateHash )
         {
-            currentActionId = actionId;
+            ++actionStackCount;
+
+            currentStateHash = stateHash;
             moveSpeed = moveSpeedRate = 0.0f;
             forwardInputAxis = 0.0f;
             isBlockedAction = true;
@@ -239,18 +242,28 @@ namespace Invector.vCharacterController
         }
 
         // Called from AnimationClip
-        public override bool EndAction( string actionId )
+        public override void EndAction( int stateHash )
         {
-            if ( base.EndAction( actionId ) == false )
+            if ( stateHash != 0 )
             {
-                return false;
+                --actionStackCount;
+                if ( actionStackCount > 0 )
+                {
+                    return;
+                }
+
+                if ( actionStackCount < 0 )
+                {
+                    Debug.LogError( "[EndAction] actionStackCount is " + actionStackCount );
+                }
             }
 
+            base.EndAction( stateHash );
             comboDelay.Reset();
             moveSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
-            return true;
+            return;
         }
 
         public override void CancelAction()
@@ -271,21 +284,13 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
+            comboDelay.Reset();
             if ( comboCount.Current >= comboCount.Max )
             {
                 comboCount.SetZero();
             }
             ++comboCount.Current;
 
-            // 임시조치. 하드코딩 없게 구조 잡도록
-            if ( comboCount.Current > 2 )
-            {
-                StartAction( "Combo" + ( comboCount.Current - 2 ) );
-            }
-            else
-            {
-                StartAction( "Combo" + comboCount.Current );
-            }
             base.BasicAttack();
         }
 
@@ -301,7 +306,6 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
-            StartAction( "Dodge" );
             base.DodgeAction();
             dodgeCooldown.Reset();
         }
@@ -335,7 +339,7 @@ namespace Invector.vCharacterController
                 yield return waitUpdate;
             }
 
-            EndAction( "Dodge" );
+            EndAction( 0 );
         }
 
         // Called from AnimationClip

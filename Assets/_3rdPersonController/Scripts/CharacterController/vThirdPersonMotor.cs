@@ -17,9 +17,6 @@ namespace Invector.vCharacterController
         public float DodgeActionSpeed = 1.0f;
         public StatusFloat dodgeCooldown;
 
-        [HideInInspector]
-        public string currentActionId;
-
         #region Inspector Variables
 
         [Header( "- Movement" )]
@@ -134,7 +131,7 @@ namespace Invector.vCharacterController
         {
             base.Update();
             comboDelay.current -= Time.deltaTime;
-            if ( isBlockedAction == false && comboDelay.Current <= 0.0f )
+            if ( isBlockedAction == false && comboDelay.Current <= 0.0f && comboCount.Current > 0 )
             {
                 comboCount.SetZero();
             }
