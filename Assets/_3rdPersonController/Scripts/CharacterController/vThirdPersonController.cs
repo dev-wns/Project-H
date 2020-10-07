@@ -63,11 +63,11 @@ namespace Invector.vCharacterController
                 return;
             }
 
-            if ( inputSmooth == Vector3.zero )
-            {
-                _rigidbody.position = animator.rootPosition;
-                _rigidbody.rotation = animator.rootRotation;
-            }
+            //if ( inputSmooth == Vector3.zero )
+            //{
+            //    _rigidbody.position = animator.rootPosition;
+            //    _rigidbody.rotation = animator.rootRotation;
+            //}
 
             if ( useRootMotion == true )
             {

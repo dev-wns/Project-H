@@ -3138,7 +3138,7 @@ MonoBehaviour:
     max: 1
     current: 0
   TeamType: 1
-  TargetingRange: 15
+  TargetingRange: 30
   currentTarget: {fileID: 0}
   MoveBlockingTime:
     max: 0.1
@@ -3149,12 +3149,11 @@ MonoBehaviour:
   comboDelay:
     max: 0.2
     current: 0
-  DodgeDistance: 10
-  DodgeActionSpeed: 1.4
+  DodgeDistance: 8
+  DodgeActionSpeed: 1.5
   dodgeCooldown:
-    max: 0.95
+    max: 0.85
     current: 0
-  currentActionId: 
   useRootMotion: 0
   rotateByWorld: 0
   useContinuousSprint: 1
