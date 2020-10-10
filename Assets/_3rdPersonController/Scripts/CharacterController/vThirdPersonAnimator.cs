@@ -84,6 +84,21 @@ namespace Invector.vCharacterController
             animator.SetTrigger( vAnimatorParameters.Attack );
         }
 
+        public virtual void SecondaryAction()
+        {
+            animator.SetTrigger( vAnimatorParameters.SecondaryAction );
+        }
+
+        public virtual void Extra1Action()
+        {
+            animator.SetTrigger( vAnimatorParameters.Extra1Action );
+        }
+
+        public virtual void Extra2Action()
+        {
+            animator.SetTrigger( vAnimatorParameters.Extra2Action );
+        }
+
         public virtual void DodgeAction()
         {
             animator.SetFloat( vAnimatorParameters.DodgeActionSpeed, DodgeActionSpeed );
@@ -104,6 +119,9 @@ namespace Invector.vCharacterController
         public static int IsBlockedAction = Animator.StringToHash( "IsBlockedAction" );
         public static int GroundDistance = Animator.StringToHash( "GroundDistance" );
         public static int Attack = Animator.StringToHash( "Attack" );
+        public static int SecondaryAction = Animator.StringToHash( "SecondaryAction" );
+        public static int Extra1Action = Animator.StringToHash( "Extra1Action" );
+        public static int Extra2Action = Animator.StringToHash( "Extra2Action" );
         public static int ComboCount = Animator.StringToHash( "ComboCount" );
         public static int EndAction = Animator.StringToHash( "EndAction" );
         public static int CancelAction = Animator.StringToHash( "CancelAction" );

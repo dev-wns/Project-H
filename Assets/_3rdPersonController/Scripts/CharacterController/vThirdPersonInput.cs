@@ -22,6 +22,9 @@ namespace Invector.vCharacterController
 
         [Header( "Action Input" )]
         public string basicAttackInput = "Attack";
+        public string secondaryInput = "SecondaryAction";
+        public string extra1Input = "Extra1Action";
+        public string extra2Input = "Extra2Action";
         public string dodgeInput = "Dodge";
         public string targetingInput = "Targeting";
 
@@ -195,7 +198,25 @@ namespace Invector.vCharacterController
             {
                 controller.BasicAttack();
             }
-            
+
+            if ( Input.GetButtonDown( secondaryInput ) == true )
+            {
+                Debug.Log( "111" );
+                controller.SecondaryAction();
+            }
+
+            if ( Input.GetButtonDown( extra1Input ) == true )
+            {
+                Debug.Log( "1" );
+                controller.Extra1Action();
+            }
+
+            if ( Input.GetButtonDown( extra2Input ) == true )
+            {
+                Debug.Log( "11" );
+                controller.Extra2Action();
+            }
+
             if ( Input.GetButtonUp( dodgeInput ) == true
                 && Time.time - dodgeInputTime < 0.2f )
             {

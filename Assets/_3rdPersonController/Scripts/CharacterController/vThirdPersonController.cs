@@ -294,6 +294,51 @@ namespace Invector.vCharacterController
             base.BasicAttack();
         }
 
+        public override void SecondaryAction()
+        {
+            if ( isBlockedAction == true )
+            {
+                if ( isCancelableAction == false )
+                {
+                    return;
+                }
+                CancelAction();
+            }
+
+            base.SecondaryAction();
+            secondaryCooldown.Reset();
+        }
+
+        public override void Extra1Action()
+        {
+            if ( isBlockedAction == true )
+            {
+                if ( isCancelableAction == false )
+                {
+                    return;
+                }
+                CancelAction();
+            }
+
+            base.Extra1Action();
+            extra1Cooldown.Reset();
+        }
+
+        public override void Extra2Action()
+        {
+            if ( isBlockedAction == true )
+            {
+                if ( isCancelableAction == false )
+                {
+                    return;
+                }
+                CancelAction();
+            }
+
+            base.Extra2Action();
+            extra2Cooldown.Reset();
+        }
+
         public override void DodgeAction()
         {
             if ( dodgeCooldown.Current > 0.0f )

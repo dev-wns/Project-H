@@ -13,6 +13,10 @@ namespace Invector.vCharacterController
         public StatusInt comboCount;
         public StatusFloat comboDelay;
 
+        public StatusFloat secondaryCooldown;
+        public StatusFloat extra1Cooldown;
+        public StatusFloat extra2Cooldown;
+
         public float DodgeDistance = 10.0f;
         public float DodgeActionSpeed = 1.0f;
         public StatusFloat dodgeCooldown;
@@ -125,6 +129,9 @@ namespace Invector.vCharacterController
             comboCount.SetZero();
             comboDelay.SetZero();
             dodgeCooldown.SetZero();
+            secondaryCooldown.SetZero();
+            extra1Cooldown.SetZero();
+            extra2Cooldown.SetZero();
         }
 
         protected override void Update()
@@ -137,6 +144,9 @@ namespace Invector.vCharacterController
             }
 
             dodgeCooldown.current -= Time.deltaTime;
+            secondaryCooldown.current -= Time.deltaTime;
+            extra1Cooldown.current -= Time.deltaTime;
+            extra2Cooldown.current -= Time.deltaTime;
         }
 
         protected virtual void FixedUpdate()
