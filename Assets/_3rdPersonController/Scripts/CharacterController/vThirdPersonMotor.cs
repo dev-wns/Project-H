@@ -15,7 +15,9 @@ namespace Invector.vCharacterController
 
         public StatusFloat secondaryCooldown;
         public StatusFloat extra1Cooldown;
+
         public StatusFloat extra2Cooldown;
+        public StatusInt windmilStackCount;
 
         public float DodgeDistance = 10.0f;
         public float DodgeActionSpeed = 1.0f;

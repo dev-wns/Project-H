@@ -3149,6 +3149,18 @@ MonoBehaviour:
   comboDelay:
     max: 0.2
     current: 0
+  secondaryCooldown:
+    max: 0
+    current: 0
+  extra1Cooldown:
+    max: 0
+    current: 0
+  extra2Cooldown:
+    max: 5
+    current: 0
+  windmilStackCount:
+    max: 8
+    current: 0
   DodgeDistance: 8
   DodgeActionSpeed: 1.5
   dodgeCooldown:
@@ -3214,6 +3226,9 @@ MonoBehaviour:
   CameraDistanceInput: CameraDistance
   CameraDistanceSpeed: 2
   basicAttackInput: Attack
+  secondaryInput: SecondaryAction
+  extra1Input: Extra1Action
+  extra2Input: Extra2Action
   dodgeInput: Dodge
   targetingInput: Targeting
   controller: {fileID: 0}

@@ -201,19 +201,16 @@ namespace Invector.vCharacterController
 
             if ( Input.GetButtonDown( secondaryInput ) == true )
             {
-                Debug.Log( "111" );
                 controller.SecondaryAction();
             }
 
             if ( Input.GetButtonDown( extra1Input ) == true )
             {
-                Debug.Log( "1" );
                 controller.Extra1Action();
             }
 
             if ( Input.GetButtonDown( extra2Input ) == true )
             {
-                Debug.Log( "11" );
                 controller.Extra2Action();
             }
 

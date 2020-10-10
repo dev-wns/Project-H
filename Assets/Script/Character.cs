@@ -34,7 +34,7 @@ public class Character : Actor
         base.SetVelocity( velocity );
     }
 
-    public virtual void MoveForward( float power )
+    public void SetForwardVelocity( float power )
     {
         SetVelocity( transform.forward * power );
     }

@@ -326,6 +326,11 @@ namespace Invector.vCharacterController
 
         public override void Extra2Action()
         {
+            if ( extra2Cooldown.Current > 0.0f )
+            {
+                return;
+            }
+
             if ( isBlockedAction == true )
             {
                 if ( isCancelableAction == false )
@@ -335,6 +340,7 @@ namespace Invector.vCharacterController
                 CancelAction();
             }
 
+            windmilStackCount.Reset();
             base.Extra2Action();
             extra2Cooldown.Reset();
         }
@@ -395,14 +401,16 @@ namespace Invector.vCharacterController
 
         #endregion
 
-        public override void MoveForward( float power )
+        public void MoveForward( AnimationEvent param )
         {
             float forwardDot = Vector3.Dot( transform.forward, Camera.main.transform.rotation * input );
             forwardDot = Mathf.Clamp( forwardDot, -1.0f, 1.0f );
             // -1 ~ 1 -> 0 ~ 1
             // 앞 = 1, 중립 = 0.5, 뒤 = 0
             forwardInputAxis = ( forwardDot + 1.0f ) * 0.5f;
-            base.MoveForward( forwardInputAxis * power );
+
+            float minPower = ( float )param.intParameter;
+            SetForwardVelocity( Mathf.Max( forwardInputAxis * param.floatParameter, minPower ) );
         }
 
         public virtual Vector3 GetProjectileSpawnPosition( Vector3 spawnPosition, float inputDistance )
