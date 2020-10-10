@@ -3153,7 +3153,7 @@ MonoBehaviour:
     max: 0
     current: 0
   extra1Cooldown:
-    max: 0
+    max: 5
     current: 0
   extra2Cooldown:
     max: 5

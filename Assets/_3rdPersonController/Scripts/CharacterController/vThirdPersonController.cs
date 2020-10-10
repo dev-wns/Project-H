@@ -311,6 +311,11 @@ namespace Invector.vCharacterController
 
         public override void Extra1Action()
         {
+            if ( extra1Cooldown.Current > 0.0f )
+            {
+                return;
+            }
+
             if ( isBlockedAction == true )
             {
                 if ( isCancelableAction == false )
@@ -410,7 +415,14 @@ namespace Invector.vCharacterController
             forwardInputAxis = ( forwardDot + 1.0f ) * 0.5f;
 
             float minPower = ( float )param.intParameter;
-            SetForwardVelocity( Mathf.Max( forwardInputAxis * param.floatParameter, minPower ) );
+            if ( param.floatParameter > 0.0f )
+            {
+                SetForwardVelocity( Mathf.Max( forwardInputAxis * param.floatParameter, minPower ) );
+            }
+            else
+            {
+                SetForwardVelocity( Mathf.Min( ( 1.0f - forwardInputAxis ) * param.floatParameter, minPower ) );
+            }
         }
 
         public virtual Vector3 GetProjectileSpawnPosition( Vector3 spawnPosition, float inputDistance )
@@ -448,13 +460,13 @@ namespace Invector.vCharacterController
 
                 case ESpawnType.LOCAL:
                 {
-                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( transform.position + ( transform.rotation * spawnPosition ), inputDistance ), transform.rotation );
+                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( spawnPosition, inputDistance ), transform.rotation );
                 }
                 break;
 
                 case ESpawnType.WORLD:
                 {
-                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( spawnPosition, inputDistance ), transform.rotation );
+                    newObject = Instantiate<GameObject>( projectile, GetProjectileSpawnPosition( transform.position + ( transform.rotation * spawnPosition ), inputDistance ), transform.rotation );
                 }
                 break;
             }
