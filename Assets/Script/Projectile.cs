@@ -24,6 +24,8 @@ public class Projectile : Actor
     public EForceType forceType;
     public Vector3 forceDirection;
     public float forcePower;
+    public float attractPower;
+    public float repelPower;
 
     [Header( "- Damage" )]
     public float damage;
@@ -110,6 +112,18 @@ public class Projectile : Actor
         if ( forcePower > 0.0f )
         {
             target.AddActorForce( transform.rotation * forceDirection * forcePower, forceType );
+        }
+
+        if ( attractPower > 0.0f )
+        {
+            Vector3 direction = ( transform.position - target.transform.position ).normalized;
+            target.AddActorForce( direction * forcePower, forceType );
+        }
+
+        if ( repelPower > 0.0f )
+        {
+            Vector3 direction = ( target.transform.position - transform.position ).normalized;
+            target.AddActorForce( direction * forcePower, forceType );
         }
 
         HitInfo info = hitInfos[ other.gameObject ];

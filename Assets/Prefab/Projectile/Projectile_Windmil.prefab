@@ -121,7 +121,9 @@ MonoBehaviour:
   duration:
     max: 0.1
     current: 0
-  forceType: 1
-  forceDirection: {x: 0, y: 0.1, z: 1}
+  forceType: 0
+  forceDirection: {x: 0, y: 0.05, z: 1}
   forcePower: 15
+  attractPower: 15
+  repelPower: 0
   damage: 2
