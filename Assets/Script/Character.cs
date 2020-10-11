@@ -28,14 +28,9 @@ public class Character : Actor
         return currentTarget != null;
     }
 
-    public override void SetVelocity( Vector3 velocity )
+    public override void AddActorForce( Vector3 force, EForceType forceType )
     {
         MoveBlockingTime.Reset();
-        base.SetVelocity( velocity );
-    }
-
-    public void SetForwardVelocity( float power )
-    {
-        SetVelocity( transform.forward * power );
+        base.AddActorForce( force, forceType );
     }
 }

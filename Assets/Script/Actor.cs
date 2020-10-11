@@ -28,20 +28,43 @@ public class Actor : MonoBehaviour
 
     #endregion
 
-    public virtual void SetVelocity( Vector3 velocity )
+    public virtual void AddActorForce( Vector3 force, EForceType forceType )
     {
         if ( _rigidbody == null )
         {
             return;
         }
 
-        _rigidbody.velocity = velocity;
+        switch ( forceType )
+        {
+            case EForceType.ADD:
+            {
+                _rigidbody.AddForce( force, ForceMode.VelocityChange );
+            } break;
+
+            case EForceType.SET:
+            {
+                _rigidbody.velocity = force;
+            }
+            break;
+
+            case EForceType.SET_WITHOUT_Y:
+            {
+                _rigidbody.velocity = new Vector3( force.x, _rigidbody.velocity.y, force.z );
+            }
+            break;
+        }
     }
 }
 
 public enum ETeamType
 {
-    RED, BLUE, GREEN
+    RED, BLUE, GREEN, NONE,
+}
+
+public enum EForceType
+{
+    ADD, SET, SET_WITHOUT_Y
 }
 
 [Serializable]

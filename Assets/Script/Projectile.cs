@@ -4,7 +4,7 @@ using System.Linq;
 using Invector.vCharacterController;
 using UnityEngine;
 
-public class Projectile : MonoBehaviour
+public class Projectile : Actor
 {
     public Actor parent;
     
@@ -21,7 +21,7 @@ public class Projectile : MonoBehaviour
     public StatusFloat duration;
 
     [Header( "- Force" )]
-    public ForceMode forceMode;
+    public EForceType forceType;
     public Vector3 forceDirection;
     public float forcePower;
 
@@ -95,6 +95,11 @@ public class Projectile : MonoBehaviour
             return;
         }
 
+        if ( target.TeamType == ETeamType.NONE )
+        {
+            return;
+        }
+
         if ( parent != null && parent.TeamType == target.TeamType )
         {
             return;
@@ -102,7 +107,10 @@ public class Projectile : MonoBehaviour
 
         float prevHP = target.HP.Current;
         target.HP.Current -= GetTotalDamage();
-        target.SetVelocity( transform.rotation * forceDirection * forcePower );
+        if ( forcePower > 0.0f )
+        {
+            target.AddActorForce( transform.rotation * forceDirection * forcePower, forceType );
+        }
 
         HitInfo info = hitInfos[ other.gameObject ];
         ++info.hitCount;
@@ -110,7 +118,7 @@ public class Projectile : MonoBehaviour
 
         if ( Mathf.Abs( prevHP - target.HP.Current ) > Mathf.Epsilon )
         {
-            Debug.Log( other.gameObject + ", hp = " + target.HP.Current + ", count = " + hitInfos[ other.gameObject ].hitCount );
+            Debug.Log( other.gameObject.name + ", HP = " + target.HP.Current );
         }
     }
 

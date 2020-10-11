@@ -427,11 +427,13 @@ namespace Invector.vCharacterController
             float minPower = ( float )param.intParameter;
             if ( param.floatParameter > 0.0f )
             {
-                SetForwardVelocity( Mathf.Max( forwardInputAxis * param.floatParameter, minPower ) );
+                float power = Mathf.Max( forwardInputAxis * param.floatParameter, minPower );
+                AddActorForce( transform.forward * power, EForceType.SET_WITHOUT_Y );
             }
             else
             {
-                SetForwardVelocity( Mathf.Min( ( 1.0f - forwardInputAxis ) * param.floatParameter, minPower ) );
+                float power = Mathf.Min( ( 1.0f - forwardInputAxis ) * param.floatParameter, minPower );
+                AddActorForce( transform.forward * power, EForceType.SET_WITHOUT_Y );
             }
         }
 
@@ -481,7 +483,12 @@ namespace Invector.vCharacterController
                 break;
             }
             
-            newObject.GetComponent<Projectile>().parent = this;
+            Projectile projectileComponent = newObject.GetComponent<Projectile>();
+            projectileComponent.parent = this;
+            if ( projectileComponent.TeamType != ETeamType.NONE )
+            {
+                projectileComponent.TeamType = TeamType;
+            }
         }
     }
 }
