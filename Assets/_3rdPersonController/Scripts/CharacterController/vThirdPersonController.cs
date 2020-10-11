@@ -148,7 +148,7 @@ namespace Invector.vCharacterController
             bool sprintConditions = ( input.sqrMagnitude > 0.1f && isGrounded == true ) && strafeSpeed.walkByDefault == false;
             //sprintConditions = sprintConditions == true && ( isStrafing == true && strafeSpeed.walkByDefault == false && ( horizontalSpeed >= 0.5 || horizontalSpeed <= -0.5 || verticalSpeed <= 0.1f ) ) == false;
 
-            if ( value == true && sprintConditions == true )
+            if ( value == true && sprintConditions == true && isBlockedAction == false )
             {
                 if ( input.sqrMagnitude > 0.1f )
                 {
@@ -165,11 +165,11 @@ namespace Invector.vCharacterController
                 {
                     isSprinting = false;
                 }
+
+                return;
             }
-            else if ( isSprinting == true )
-            {
-                isSprinting = false;
-            }
+
+            isSprinting = false;
         }
 
         public virtual void Strafe( bool isEnable )
@@ -235,7 +235,8 @@ namespace Invector.vCharacterController
             ++actionStackCount;
 
             currentStateHash = stateHash;
-            moveSpeed = moveSpeedRate = 0.0f;
+            moveSpeedRate = 0.0f;
+            rotateSpeedRate = 0.0f;
             forwardInputAxis = 0.0f;
             isBlockedAction = true;
             isCancelableAction = false;
@@ -261,6 +262,7 @@ namespace Invector.vCharacterController
             base.EndAction( stateHash );
             comboDelay.Reset();
             moveSpeedRate = 1.0f;
+            rotateSpeedRate = 1.0f;
             isBlockedAction = false;
             isCancelableAction = false;
             return;
@@ -271,6 +273,16 @@ namespace Invector.vCharacterController
             base.CancelAction();
             isBlockedAction = false;
             isCancelableAction = false;
+        }
+
+        public virtual void SetMoveSpeedRate( float speed )
+        {
+            moveSpeedRate = speed;
+        }
+
+        public virtual void SetRotateSpeedRate( float speed )
+        {
+            rotateSpeedRate = speed;
         }
 
         public override void BasicAttack()

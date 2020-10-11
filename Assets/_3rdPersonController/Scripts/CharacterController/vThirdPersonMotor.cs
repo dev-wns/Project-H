@@ -7,6 +7,7 @@ namespace Invector.vCharacterController
         internal bool isBlockedAction = false;
         internal bool isCancelableAction = false;
         internal float moveSpeedRate = 1.0f;
+        internal float rotateSpeedRate = 1.0f;
 
         [Header( "- Action" )]
 
@@ -287,18 +288,13 @@ namespace Invector.vCharacterController
 
         public virtual void RotateToDirection( Vector3 direction, float rotationSpeed )
         {
-            if ( isBlockedAction == true )
-            {
-                return;
-            }
-
             if ( isGrounded == false && jumpAndRotate == false )
             {
                 return;
             }
 
             direction.y = 0f;
-            Vector3 desiredForward = Vector3.RotateTowards( transform.forward, direction.normalized, rotationSpeed * Time.deltaTime, .1f );
+            Vector3 desiredForward = Vector3.RotateTowards( transform.forward, direction.normalized, rotationSpeed * rotateSpeedRate * Time.deltaTime, 0.1f );
             Quaternion _newRotation = Quaternion.LookRotation( desiredForward );
             _rigidbody.MoveRotation( _newRotation );
         }

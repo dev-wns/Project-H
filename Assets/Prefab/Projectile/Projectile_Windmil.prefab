@@ -116,10 +116,10 @@ MonoBehaviour:
     current: 0
   TeamType: 3
   parent: {fileID: 0}
-  maxHitCount: 3
+  maxHitCount: 4
   reHitDelay: 0.02
   duration:
-    max: 0.1
+    max: 0.15
     current: 0
   forceType: 0
   forceDirection: {x: 0, y: 0.05, z: 1}

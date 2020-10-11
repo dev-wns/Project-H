@@ -47609,6 +47609,13 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
+  - time: 0
+    functionName: SetMoveSpeedRate
+    data: 
+    objectReferenceParameter: {fileID: 0}
+    floatParameter: 1.6
+    intParameter: 0
+    messageOptions: 0
   - time: 0.06666667
     functionName: SpawnProjectile
     data: '{"x":0,"y":0,"z":0}'
