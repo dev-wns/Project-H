@@ -189,6 +189,11 @@ namespace Invector.vCharacterController
         float dodgeInputTime = 0.0f;
         protected virtual void ActionInput()
         {
+            if ( Input.GetButtonUp( secondaryInput ) == true )
+            {
+                controller.SecondaryKeyDown( false );
+            }
+
             if ( JumpConditions() == false )
             {
                 return;
@@ -201,6 +206,7 @@ namespace Invector.vCharacterController
 
             if ( Input.GetButtonDown( secondaryInput ) == true )
             {
+                controller.SecondaryKeyDown( true );
                 controller.SecondaryAction();
             }
 

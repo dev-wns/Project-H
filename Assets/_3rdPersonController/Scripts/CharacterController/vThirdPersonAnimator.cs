@@ -86,7 +86,25 @@ namespace Invector.vCharacterController
 
         public virtual void SecondaryAction()
         {
+            whirlwindStackCount.SetZero();
+            animator.SetInteger( vAnimatorParameters.WhirlwindStackCount, whirlwindStackCount.Current );
             animator.SetTrigger( vAnimatorParameters.SecondaryAction );
+        }
+
+        public void IncreaseWhirlwindStack( int count )
+        {
+            whirlwindStackCount.Current += count;
+            animator.SetInteger( vAnimatorParameters.WhirlwindStackCount, whirlwindStackCount.Current );
+
+            if ( whirlwindStackCount.Current >= whirlwindStackCount.Max )
+            {
+                animator.SetBool( vAnimatorParameters.SecondaryKeyDown, false );
+            }
+        }
+
+        public virtual void SecondaryKeyDown( bool isDown )
+        {
+            animator.SetBool( vAnimatorParameters.SecondaryKeyDown, isDown );
         }
 
         public virtual void Extra1Action()
@@ -127,6 +145,8 @@ namespace Invector.vCharacterController
         public static int GroundDistance = Animator.StringToHash( "GroundDistance" );
         public static int Attack = Animator.StringToHash( "Attack" );
         public static int SecondaryAction = Animator.StringToHash( "SecondaryAction" );
+        public static int SecondaryKeyDown = Animator.StringToHash( "SecondaryKeyDown" );
+        public static int WhirlwindStackCount = Animator.StringToHash( "WhirlwindStackCount" );
         public static int Extra1Action = Animator.StringToHash( "Extra1Action" );
         public static int Extra2Action = Animator.StringToHash( "Extra2Action" );
         public static int WindmilStackCount = Animator.StringToHash( "WindmilStackCount" );

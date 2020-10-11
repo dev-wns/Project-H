@@ -296,6 +296,11 @@ namespace Invector.vCharacterController
 
         public override void SecondaryAction()
         {
+            if ( secondaryCooldown.Current > 0.0f )
+            {
+                return;
+            }
+
             if ( isBlockedAction == true )
             {
                 if ( isCancelableAction == false )
@@ -307,6 +312,11 @@ namespace Invector.vCharacterController
 
             base.SecondaryAction();
             secondaryCooldown.Reset();
+        }
+
+        public override void SecondaryKeyDown( bool isDown )
+        {
+            base.SecondaryKeyDown( isDown );
         }
 
         public override void Extra1Action()

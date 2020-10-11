@@ -14,6 +14,8 @@ namespace Invector.vCharacterController
         public StatusFloat comboDelay;
 
         public StatusFloat secondaryCooldown;
+        public StatusInt whirlwindStackCount;
+
         public StatusFloat extra1Cooldown;
 
         public StatusFloat extra2Cooldown;

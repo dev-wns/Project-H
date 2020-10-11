@@ -3150,7 +3150,10 @@ MonoBehaviour:
     max: 0.2
     current: 0
   secondaryCooldown:
-    max: 0
+    max: 5
+    current: 0
+  whirlwindStackCount:
+    max: 15
     current: 0
   extra1Cooldown:
     max: 5
