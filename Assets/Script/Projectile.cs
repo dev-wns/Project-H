@@ -30,8 +30,9 @@ public class Projectile : Actor
     [Header( "- Damage" )]
     public float damage;
 
-    void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         duration.Reset();
         forceDirection.Normalize();
     }
